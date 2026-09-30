@@ -10,4 +10,5 @@ coverage/
 generated/
 *.pem
 *.key
+*.tsbuildinfo
 !.env.example
