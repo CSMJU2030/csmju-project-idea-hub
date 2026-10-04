@@ -33,6 +33,16 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
     githubUrl: project.githubUrl || '',
     demoUrl: project.demoUrl || '',
     reportPdfUrl: project.reportPdfUrl || '',
+    proposalUrl: project.proposalUrl || '',
+    progressReportUrl: project.progressReportUrl || '',
+    fullThesisPdfUrl: project.fullThesisPdfUrl || project.reportPdfUrl || '',
+    posterImageUrl: project.posterImageUrl || '',
+    demoVideoUrl: project.demoVideoUrl || '',
+    chapter1: project.chaptersSummary?.chapter1 || '',
+    chapter2: project.chaptersSummary?.chapter2 || '',
+    chapter3: project.chaptersSummary?.chapter3 || '',
+    chapter4: project.chaptersSummary?.chapter4 || '',
+    chapter5: project.chaptersSummary?.chapter5 || '',
   });
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -49,6 +59,14 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
       .map((item) => item.trim())
       .filter(Boolean);
 
+    const chaptersSummary = {
+      chapter1: form.chapter1.trim() || undefined,
+      chapter2: form.chapter2.trim() || undefined,
+      chapter3: form.chapter3.trim() || undefined,
+      chapter4: form.chapter4.trim() || undefined,
+      chapter5: form.chapter5.trim() || undefined,
+    };
+
     startTransition(async () => {
       const res = await updateProjectAction({
         id: project.id,
@@ -60,7 +78,13 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
         techStack,
         githubUrl: form.githubUrl.trim() || undefined,
         demoUrl: form.demoUrl.trim() || undefined,
-        reportPdfUrl: form.reportPdfUrl.trim() || undefined,
+        reportPdfUrl: form.fullThesisPdfUrl.trim() || form.reportPdfUrl.trim() || undefined,
+        proposalUrl: form.proposalUrl.trim() || undefined,
+        progressReportUrl: form.progressReportUrl.trim() || undefined,
+        fullThesisPdfUrl: form.fullThesisPdfUrl.trim() || form.reportPdfUrl.trim() || undefined,
+        posterImageUrl: form.posterImageUrl.trim() || undefined,
+        demoVideoUrl: form.demoVideoUrl.trim() || undefined,
+        chaptersSummary,
       });
 
       if (!res.success) {
@@ -115,20 +139,9 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
         </div>
       )}
 
-      {/* แจ้งเตือนเหตุผลกรณีถูกส่งกลับแก้ไข */}
-      {project.status === 'REJECTED' && project.rejectionReason && (
-        <div className="p-4 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 text-sm space-y-1">
-          <p className="font-bold flex items-center gap-1.5">
-            <span>📝</span> ข้อเสนอแนะที่ต้องปรับปรุงจากอาจารย์ที่ปรึกษา:
-          </p>
-          <p className="text-sm bg-white p-3 rounded-lg border border-amber-200 text-slate-700">
-            {project.rejectionReason}
-          </p>
-        </div>
-      )}
-
+      {/* 1. ข้อมูลทั่วไป */}
       <fieldset className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
-        <legend className="text-base font-bold text-csmju-primary px-2">ข้อมูลโครงงาน</legend>
+        <legend className="text-base font-bold text-csmju-primary px-2">1. ข้อมูลผลงานทั่วไป</legend>
 
         <div>
           <label htmlFor="titleTh" className="block text-sm font-semibold mb-1">
@@ -167,7 +180,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="category" className="block text-sm font-semibold mb-1">
-              หมวดหมู่ผลงาน <span className="text-red-500">*</span>
+              หมวดหมู่ <span className="text-red-500">*</span>
             </label>
             <select
               id="category"
@@ -190,6 +203,8 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
             <input
               id="academicYear"
               type="number"
+              min={2560}
+              max={2580}
               required
               value={form.academicYear}
               onChange={(e) => setForm({ ...form, academicYear: Number(e.target.value) })}
@@ -232,10 +247,184 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
         </div>
       </fieldset>
 
+      {/* 2. โครงสร้างเอกสารปริญญานิพนธ์ 5 บท */}
       <fieldset className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
-        <legend className="text-base font-bold text-csmju-primary px-2">ลิงก์ภายนอก</legend>
+        <legend className="text-base font-bold text-csmju-primary px-2">
+          2. โครงสร้างเอกสารปริญญานิพนธ์ 5 บท (Senior Project Chapters)
+        </legend>
+        <p className="text-xs text-slate-500 px-2">
+          สรุปย่อของแต่ละบทช่วยให้ระบบสามารถค้นหา (Search) และให้ผู้สนใจหรือรุ่นน้องสืบค้นแนวทางได้อย่างรวดเร็ว
+        </p>
+
+        <div>
+          <label htmlFor="chapter1" className="block text-sm font-semibold mb-1">
+            บทที่ 1: บทนำ (Introduction)
+          </label>
+          <textarea
+            id="chapter1"
+            rows={2}
+            value={form.chapter1}
+            onChange={(e) => setForm({ ...form, chapter1: e.target.value })}
+            placeholder="สรุปความเป็นมา วัตถุประสงค์ ขอบเขตของโครงงาน..."
+            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="chapter2" className="block text-sm font-semibold mb-1">
+            บทที่ 2: ทฤษฎีและงานวิจัยที่เกี่ยวข้อง (Literature Review)
+          </label>
+          <textarea
+            id="chapter2"
+            rows={2}
+            value={form.chapter2}
+            onChange={(e) => setForm({ ...form, chapter2: e.target.value })}
+            placeholder="สรุปทฤษฎี เทคโนโลยีที่ใช้ และงานวิจัยที่นำมาอ้างอิง..."
+            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="chapter3" className="block text-sm font-semibold mb-1">
+            บทที่ 3: วิธีการดำเนินงานและการออกแบบระบบ (System Design & Methodology)
+          </label>
+          <textarea
+            id="chapter3"
+            rows={2}
+            value={form.chapter3}
+            onChange={(e) => setForm({ ...form, chapter3: e.target.value })}
+            placeholder="สรุปสถาปัตยกรรมระบบ แผนภาพ DFD, ER-Diagram..."
+            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="chapter4" className="block text-sm font-semibold mb-1">
+            บทที่ 4: ผลการดำเนินงานและการทดสอบระบบ (Implementation & Testing)
+          </label>
+          <textarea
+            id="chapter4"
+            rows={2}
+            value={form.chapter4}
+            onChange={(e) => setForm({ ...form, chapter4: e.target.value })}
+            placeholder="สรุปผลการพัฒนาระบบ ผลการทดสอบ Unit/Integration Test หรือ UAT..."
+            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="chapter5" className="block text-sm font-semibold mb-1">
+            บทที่ 5: สรุปผล อภิปรายผล และข้อเสนอแนะ (Conclusion & Discussion)
+          </label>
+          <textarea
+            id="chapter5"
+            rows={2}
+            value={form.chapter5}
+            onChange={(e) => setForm({ ...form, chapter5: e.target.value })}
+            placeholder="สรุปผลตามวัตถุประสงค์ ปัญหาที่พบในการพัฒนา และข้อเสนอแนะ..."
+            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+          />
+        </div>
+      </fieldset>
+
+      {/* 3. ไฟล์และชิ้นงานส่งมอบ (Deliverables) */}
+      <fieldset className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+        <legend className="text-base font-bold text-csmju-primary px-2">
+          3. ไฟล์และชิ้นงานส่งมอบ (Deliverables & Cloud Storage Links)
+        </legend>
+        <div className="p-3 bg-blue-50 text-blue-800 rounded-xl text-xs flex items-center gap-2">
+          <span>ℹ️</span>
+          <span>
+            <strong>ข้อกำหนด PM:</strong> จัดเก็บไฟล์แบบ Cloud URLs ลิงก์ตรง (เช่น Google Drive, OneDrive, GitHub, YouTube)
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="proposalUrl" className="block text-sm font-semibold mb-1">
+              เอกสารข้อเสนอโครงงาน (Proposal PDF URL)
+            </label>
+            <input
+              id="proposalUrl"
+              type="url"
+              value={form.proposalUrl}
+              onChange={(e) => setForm({ ...form, proposalUrl: e.target.value })}
+              placeholder="https://drive.google.com/.../proposal.pdf"
+              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            />
+            {fieldErrors.proposalUrl && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.proposalUrl[0]}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="progressReportUrl" className="block text-sm font-semibold mb-1">
+              รายงานก้าวหน้า 3 บท (Progress Report PDF URL)
+            </label>
+            <input
+              id="progressReportUrl"
+              type="url"
+              value={form.progressReportUrl}
+              onChange={(e) => setForm({ ...form, progressReportUrl: e.target.value })}
+              placeholder="https://drive.google.com/.../progress-3chapters.pdf"
+              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            />
+            {fieldErrors.progressReportUrl && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.progressReportUrl[0]}</p>
+            )}
+          </div>
+
+          <div className="sm:col-span-2">
+            <label htmlFor="fullThesisPdfUrl" className="block text-sm font-semibold mb-1">
+              เล่มรายงานฉบับสมบูรณ์ 5 บท (Full Thesis PDF URL)
+            </label>
+            <input
+              id="fullThesisPdfUrl"
+              type="url"
+              value={form.fullThesisPdfUrl}
+              onChange={(e) => setForm({ ...form, fullThesisPdfUrl: e.target.value })}
+              placeholder="https://drive.google.com/.../full-thesis.pdf"
+              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            />
+            {fieldErrors.fullThesisPdfUrl && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.fullThesisPdfUrl[0]}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="posterImageUrl" className="block text-sm font-semibold mb-1">
+              ลิงก์รูปภาพโปสเตอร์ (Poster Image URL)
+            </label>
+            <input
+              id="posterImageUrl"
+              type="url"
+              value={form.posterImageUrl}
+              onChange={(e) => setForm({ ...form, posterImageUrl: e.target.value })}
+              placeholder="https://images.unsplash.com/... หรือ ลิงก์รูปภาพ"
+              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            />
+            {fieldErrors.posterImageUrl && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.posterImageUrl[0]}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="demoVideoUrl" className="block text-sm font-semibold mb-1">
+              วิดีโอสาธิตระบบ (Demo Video URL - YouTube/Stream)
+            </label>
+            <input
+              id="demoVideoUrl"
+              type="url"
+              value={form.demoVideoUrl}
+              onChange={(e) => setForm({ ...form, demoVideoUrl: e.target.value })}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            />
+            {fieldErrors.demoVideoUrl && (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.demoVideoUrl[0]}</p>
+            )}
+          </div>
+
           <div>
             <label htmlFor="githubUrl" className="block text-sm font-semibold mb-1">
               GitHub Repository URL
@@ -258,20 +447,6 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
               type="url"
               value={form.demoUrl}
               onChange={(e) => setForm({ ...form, demoUrl: e.target.value })}
-              className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <label htmlFor="reportPdfUrl" className="block text-sm font-semibold mb-1">
-              ลิงก์ไฟล์เล่มรายงาน (PDF Document URL)
-            </label>
-            <input
-              id="reportPdfUrl"
-              type="url"
-              value={form.reportPdfUrl}
-              onChange={(e) => setForm({ ...form, reportPdfUrl: e.target.value })}
-              placeholder="https://example.com/reports/final-project.pdf"
               className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
             />
           </div>

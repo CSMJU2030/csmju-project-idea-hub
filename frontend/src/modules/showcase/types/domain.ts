@@ -19,6 +19,14 @@ export interface ProjectAdvisor {
   name: string;
 }
 
+export interface ChapterSummaries {
+  chapter1?: string; // บทที่ 1: บทนำ (Introduction, วัตถุประสงค์, ขอบเขต)
+  chapter2?: string; // บทที่ 2: ทฤษฎีและงานวิจัยที่เกี่ยวข้อง (Literature Review)
+  chapter3?: string; // บทที่ 3: วิธีการดำเนินงานและการออกแบบระบบ (System Design & Methodology)
+  chapter4?: string; // บทที่ 4: ผลการดำเนินงานและการทดสอบระบบ (Implementation & Testing)
+  chapter5?: string; // บทที่ 5: สรุปผล อภิปรายผล และข้อเสนอแนะ (Conclusion & Discussion)
+}
+
 export interface Project {
   id: string;
   titleTh: string;
@@ -33,6 +41,12 @@ export interface Project {
   githubUrl?: string;
   demoUrl?: string;
   reportPdfUrl?: string;
+  proposalUrl?: string;
+  progressReportUrl?: string;
+  fullThesisPdfUrl?: string;
+  posterImageUrl?: string;
+  demoVideoUrl?: string;
+  chaptersSummary?: ChapterSummaries;
   status: ProjectStatus;
   rejectionReason?: string;
   createdAt: Date;
@@ -83,6 +97,12 @@ export interface CreateProjectInput {
   githubUrl?: string;
   demoUrl?: string;
   reportPdfUrl?: string;
+  proposalUrl?: string;
+  progressReportUrl?: string;
+  fullThesisPdfUrl?: string;
+  posterImageUrl?: string;
+  demoVideoUrl?: string;
+  chaptersSummary?: ChapterSummaries;
 }
 
 export interface UpdateProjectInput extends Partial<CreateProjectInput> {

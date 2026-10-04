@@ -68,6 +68,36 @@ export function validateProjectInput(input: CreateProjectInput): ValidationResul
     }
   }
 
+  if (input.proposalUrl && input.proposalUrl.trim() !== '') {
+    if (!isValidUrl(input.proposalUrl)) {
+      addError('proposalUrl', 'ลิงก์เอกสารข้อเสนอโครงงาน (Proposal) ต้องเป็น URL ที่ถูกต้อง');
+    }
+  }
+
+  if (input.progressReportUrl && input.progressReportUrl.trim() !== '') {
+    if (!isValidUrl(input.progressReportUrl)) {
+      addError('progressReportUrl', 'ลิงก์รายงานความก้าวหน้า 3 บท ต้องเป็น URL ที่ถูกต้อง');
+    }
+  }
+
+  if (input.fullThesisPdfUrl && input.fullThesisPdfUrl.trim() !== '') {
+    if (!isValidUrl(input.fullThesisPdfUrl)) {
+      addError('fullThesisPdfUrl', 'ลิงก์เล่มรายงานฉบับสมบูรณ์ (Full Thesis PDF) ต้องเป็น URL ที่ถูกต้อง');
+    }
+  }
+
+  if (input.posterImageUrl && input.posterImageUrl.trim() !== '') {
+    if (!isValidUrl(input.posterImageUrl)) {
+      addError('posterImageUrl', 'ลิงก์โปสเตอร์โครงงานต้องเป็น URL ที่ถูกต้อง');
+    }
+  }
+
+  if (input.demoVideoUrl && input.demoVideoUrl.trim() !== '') {
+    if (!isValidUrl(input.demoVideoUrl)) {
+      addError('demoVideoUrl', 'ลิงก์วิดีโอสาธิตระบบต้องเป็น URL ที่ถูกต้อง');
+    }
+  }
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors,

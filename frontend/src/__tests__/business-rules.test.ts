@@ -113,6 +113,55 @@ describe('1. Input Validation Rules', () => {
     assert.equal(res.isValid, false);
     assert.ok(res.errors.githubUrl);
   });
+
+  it('ผ่านเมื่อระบุเอกสาร 5 บทและ Deliverables ครบถ้วนถูกต้องตามเกณฑ์สาขา', () => {
+    const res = validateProjectInput({
+      titleTh: 'ระบบวิเคราะห์ข้อมูลการเกษตรแม่โจ้',
+      titleEn: 'Maejo Agricultural Data Analytics System',
+      abstract: 'ระบบประมวลผลข้อมูลการเกษตรเพื่อช่วยเกษตรกรในการพยากรณ์ผลผลิตและคุณภาพดิน',
+      academicYear: 2568,
+      category: 'Data Science & Analytics',
+      tags: ['Data', 'Python'],
+      techStack: ['Python', 'FastAPI', 'Next.js'],
+      members: [{ studentId: 'std-01', name: 'สมชาย' }],
+      advisors: [{ advisorId: 'adv-01', name: 'อาจารย์ใจดี' }],
+      proposalUrl: 'https://storage.googleapis.com/theses/proposal.pdf',
+      progressReportUrl: 'https://storage.googleapis.com/theses/progress-3chapters.pdf',
+      fullThesisPdfUrl: 'https://storage.googleapis.com/theses/full-thesis.pdf',
+      posterImageUrl: 'https://storage.googleapis.com/theses/poster.png',
+      demoVideoUrl: 'https://youtube.com/watch?v=demo123',
+      chaptersSummary: {
+        chapter1: 'บทนำและวัตถุประสงค์',
+        chapter2: 'ทฤษฎีและงานวิจัยที่เกี่ยวข้อง',
+        chapter3: 'การออกแบบระบบ DFD/ERD',
+        chapter4: 'ผลการทดสอบระบบ',
+        chapter5: 'สรุปผลและข้อเสนอแนะ',
+      },
+    });
+    assert.equal(res.isValid, true);
+    assert.equal(Object.keys(res.errors).length, 0);
+  });
+
+  it('ไม่ผ่านเมื่อ URL เอกสาร Deliverables ผิดรูปแบบ', () => {
+    const res = validateProjectInput({
+      titleTh: 'ระบบทดสอบลิงก์เอกสารผิดรูปแบบ',
+      titleEn: 'Invalid Deliverables URL Test',
+      abstract: 'คำอธิบายโครงการความยาวเพียงพอตามเกณฑ์ที่ระบบกำหนดไว้',
+      academicYear: 2568,
+      category: 'Web Application',
+      tags: [],
+      techStack: ['React'],
+      members: [{ studentId: 'std-01', name: 'สมชาย' }],
+      advisors: [{ advisorId: 'adv-01', name: 'อาจารย์ใจดี' }],
+      proposalUrl: 'invalid-proposal-url',
+      fullThesisPdfUrl: 'invalid-thesis-pdf-url',
+      demoVideoUrl: 'invalid-video-url',
+    });
+    assert.equal(res.isValid, false);
+    assert.ok(res.errors.proposalUrl);
+    assert.ok(res.errors.fullThesisPdfUrl);
+    assert.ok(res.errors.demoVideoUrl);
+  });
 });
 
 describe('2. Authorization & Ownership Rules (403 Forbidden Cases)', () => {

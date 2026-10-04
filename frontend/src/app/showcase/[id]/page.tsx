@@ -11,17 +11,50 @@ const initialMockProject: Project = {
   id: 'proj-001',
   titleTh: 'ระบบคลังโปรเจกต์และไอเดีย CSMJU',
   titleEn: 'CSMJU Project Showcase Hub',
-  abstract: 'ระบบจัดการและจัดแสดงผลงานวิทยานิพนธ์และไอเดียเทคโนโลยีสำหรับนักศึกษา พร้อมระบบประเมินผลงานจากศิษย์เก่าและคณาจารย์',
+  abstract: 'ระบบจัดการและจัดแสดงผลงานวิทยานิพนธ์และไอเดียเทคโนโลยีสำหรับนักศึกษา พร้อมระบบเชื่อมต่อสถาปัตยกรรมกลาง CSMJU2030 และประเมินผลงานจากอาจารย์และศิษย์เก่า',
   academicYear: 2568,
   category: 'Web Application',
-  tags: ['Next.js', 'TypeScript', 'TailwindCSS'],
-  techStack: ['Next.js', 'PostgreSQL', 'TailwindCSS v4'],
+  tags: ['Next.js', 'TypeScript', 'TailwindCSS', 'Central SSO'],
+  techStack: ['Next.js', 'NestJS', 'PostgreSQL', 'TailwindCSS v4', 'Prisma'],
   members: [{ studentId: 'user-std-001', name: 'สมชาย นักศึกษา', isOwner: true }],
   advisors: [{ advisorId: 'adv-001', name: 'ผศ.ดร. ที่ปรึกษา ใจดี' }],
+  githubUrl: 'https://github.com/CSMJU2030/csmju-project-idea-hub',
+  demoUrl: 'https://showcase.csmju2030.local',
+  reportPdfUrl: 'https://storage.googleapis.com/csmju-theses/2568/proj-001/full-thesis.pdf',
+  proposalUrl: 'https://storage.googleapis.com/csmju-theses/2568/proj-001/proposal.pdf',
+  progressReportUrl: 'https://storage.googleapis.com/csmju-theses/2568/proj-001/progress-3chapters.pdf',
+  fullThesisPdfUrl: 'https://storage.googleapis.com/csmju-theses/2568/proj-001/full-thesis.pdf',
+  posterImageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80',
+  demoVideoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  chaptersSummary: {
+    chapter1: 'บทที่ 1 บทนำ: ศึกษาปัญหาการจัดเก็บผลงานโครงงานพิเศษของสาขาวิทยาการคอมพิวเตอร์ที่ยังกระจัดกระจาย ขาดระบบสืบค้นผลงานของรุ่นพี่ กำหนดวัตถุประสงค์เพื่อพัฒนาระบบคลังผลงานกลางที่เชื่อมโยงกับแพลตฟอร์ม CSMJU2030',
+    chapter2: 'บทที่ 2 ทฤษฎีและงานวิจัยที่เกี่ยวข้อง: ศึกษาทฤษฎี Microservices, Single Sign-On (RS256 JWKS), RBAC, Design System Tokens, และการเปรียบเทียบระบบคลังผลงานวิทยานิพนธ์ของสถาบันอื่น',
+    chapter3: 'บทที่ 3 วิธีการดำเนินงานและการออกแบบระบบ: ออกแบบ System Architecture แบบ 1 Subsystem = 1 DB = 1 Repo, ออกแบบ DFD Level 0-2, Database ERD (Prisma snake_case), และ Wireframes ตาม CSMJU UI Tokens',
+    chapter4: 'บทที่ 4 ผลการดำเนินงานและการทดสอบระบบ: พัฒนาเว็บแอปพลิเคชัน Next.js App Router และ NestJS API, ทดสอบ SSO Integration T1-T9, Unit Test 61 ข้อผ่าน 100%, และการทดสอบ UAT จากกลุ่มตัวอย่างอาจารย์และนักศึกษา',
+    chapter5: 'บทที่ 5 สรุปผล อภิปรายผล และข้อเสนอแนะ: ระบบสามารถทำงานได้ตามวัตถุประสงค์ รองรับการสืบค้นโครงงานและให้ Feedback จากศิษย์เก่า ข้อเสนอแนะในอนาคตคือการเชื่อมต่อ AI Semantic Search และการส่งออกเล่มรายงานอัตโนมัติ',
+  },
   status: 'APPROVED',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+
+function getYouTubeEmbedUrl(url?: string): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtube.com')) {
+      const v = parsed.searchParams.get('v');
+      return v ? `https://www.youtube.com/embed/${v}` : null;
+    }
+    if (parsed.hostname.includes('youtu.be')) {
+      const v = parsed.pathname.slice(1);
+      return v ? `https://www.youtube.com/embed/${v}` : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -31,6 +64,7 @@ export default function ProjectDetailPage() {
     ...initialMockProject,
     id: projectId,
   }));
+  const [activeTab, setActiveTab] = useState<'overview' | 'chapters' | 'deliverables'>('overview');
   const [feedbacks, setFeedbacks] = useState<ProjectFeedback[]>([]);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
@@ -53,6 +87,8 @@ export default function ProjectDetailPage() {
       setTimeout(() => setContactSuccess(false), 4000);
     });
   };
+
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(project.demoVideoUrl);
 
   return (
     <main className="min-h-screen bg-csmju-surface-muted py-10 px-4 sm:px-6 lg:px-8 text-csmju-text-body">
@@ -104,90 +140,346 @@ export default function ProjectDetailPage() {
 
           <h1 className="text-2xl sm:text-3xl font-bold text-csmju-primary">{project.titleTh}</h1>
           <p className="text-base text-slate-600 font-medium mt-1">{project.titleEn}</p>
+
+          {/* เมนูแท็บเพื่อสลับดูข้อมูล */}
+          <nav className="flex border-b border-slate-200 mt-6 gap-2" aria-label="Project tabs">
+            <button
+              type="button"
+              onClick={() => setActiveTab('overview')}
+              className={`pb-3 px-4 text-sm font-bold transition border-b-2 ${
+                activeTab === 'overview'
+                  ? 'border-csmju-primary text-csmju-primary'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              📋 ภาพรวมโครงงาน
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('chapters')}
+              className={`pb-3 px-4 text-sm font-bold transition border-b-2 ${
+                activeTab === 'chapters'
+                  ? 'border-csmju-primary text-csmju-primary'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              📚 เอกสาร 5 บท (Senior Thesis)
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('deliverables')}
+              className={`pb-3 px-4 text-sm font-bold transition border-b-2 ${
+                activeTab === 'deliverables'
+                  ? 'border-csmju-primary text-csmju-primary'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              🚀 ชิ้นงานและสื่อส่งมอบ (Deliverables)
+            </button>
+          </nav>
         </header>
 
-        {/* รายละเอียดผลงาน */}
-        <section className="bg-white p-8 rounded-2xl border border-slate-200 space-y-5">
-          <div>
-            <h2 className="text-base font-bold text-csmju-primary mb-2">บทคัดย่อ</h2>
-            <p className="text-sm leading-[1.6] text-slate-700 whitespace-pre-line">
-              {project.abstract}
-            </p>
-          </div>
+        {/* แท็บที่ 1: ภาพรวมผลงาน */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            <section className="bg-white p-8 rounded-2xl border border-slate-200 space-y-5">
+              <div>
+                <h2 className="text-base font-bold text-csmju-primary mb-2">บทคัดย่อ</h2>
+                <p className="text-sm leading-[1.6] text-slate-700 whitespace-pre-line">
+                  {project.abstract}
+                </p>
+              </div>
 
-          <div className="pt-4 border-t border-slate-100">
-            <h3 className="text-sm font-bold text-slate-700 mb-2">Tech Stack ที่ใช้งาน</h3>
-            <div className="flex flex-wrap gap-2">
-              {project.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="text-xs px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-mono"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
+              <div className="pt-4 border-t border-slate-100">
+                <h3 className="text-sm font-bold text-slate-700 mb-2">Tech Stack ที่ใช้งาน</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="text-xs px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-mono"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-          <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="font-semibold text-slate-500">คณะผู้จัดทำ:</p>
-              <ul className="list-disc list-inside mt-1 text-slate-700">
-                {project.members.map((m) => (
-                  <li key={m.studentId}>
-                    {m.name} {m.isOwner ? '(หัวหน้า)' : ''}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-500">อาจารย์ที่ปรึกษา:</p>
-              <ul className="list-disc list-inside mt-1 text-slate-700">
-                {project.advisors.map((a) => (
-                  <li key={a.advisorId}>{a.name}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
+              <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold text-slate-500">คณะผู้จัดทำ:</p>
+                  <ul className="list-disc list-inside mt-1 text-slate-700">
+                    {project.members.map((m) => (
+                      <li key={m.studentId}>
+                        {m.name} {m.isOwner ? '(หัวหน้า)' : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-500">อาจารย์ที่ปรึกษา:</p>
+                  <ul className="list-disc list-inside mt-1 text-slate-700">
+                    {project.advisors.map((a) => (
+                      <li key={a.advisorId}>{a.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
 
-        {/* ลิงก์และเอกสารเผยแพร่ */}
-        {(project.githubUrl || project.demoUrl || project.reportPdfUrl) && (
-          <section className="bg-white p-6 rounded-2xl border border-slate-200">
-            <h2 className="text-sm font-bold text-csmju-primary mb-3">ลิงก์และเอกสารเผยแพร่</h2>
-            <div className="flex flex-wrap gap-3">
-              {project.githubUrl && (
+            {/* วิดีโอเดโมในหน้าภาพรวม */}
+            {youtubeEmbedUrl ? (
+              <section className="bg-white p-6 rounded-2xl border border-slate-200 space-y-3">
+                <h2 className="text-sm font-bold text-csmju-primary">🎬 วิดีโอสาธิตระบบ (Demo Video)</h2>
+                <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200">
+                  <iframe
+                    src={youtubeEmbedUrl}
+                    title="Project Demo Video"
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </section>
+            ) : project.demoVideoUrl ? (
+              <section className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-csmju-primary">🎬 วิดีโอสาธิตระบบ</h2>
+                  <p className="text-xs text-slate-500 mt-1">รับชมวิดีโอนำเสนอและสาธิตการทำงานของผลงาน</p>
+                </div>
                 <a
-                  href={project.githubUrl}
+                  href={project.demoVideoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl transition"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition"
                 >
-                  <span>📂</span> GitHub Repository
+                  เปิดดูวิดีโอ ↗
                 </a>
+              </section>
+            ) : null}
+          </div>
+        )}
+
+        {/* แท็บที่ 2: เอกสาร 5 บทมาตรฐานของสาขาวิทยาการคอมพิวเตอร์ */}
+        {activeTab === 'chapters' && (
+          <div className="space-y-6">
+            {/* กล่องดาวน์โหลดเอกสาร */}
+            <section className="bg-white p-6 rounded-2xl border border-slate-200">
+              <h2 className="text-base font-bold text-csmju-primary mb-3">
+                📥 ดาวน์โหลดเอกสารวิชาการโครงงาน (PDF Documents)
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+                  <div>
+                    <span className="text-lg">📄</span>
+                    <h3 className="text-xs font-bold text-slate-800 mt-1">ข้อเสนอโครงงาน</h3>
+                    <p className="text-[11px] text-slate-500">Project Proposal</p>
+                  </div>
+                  {project.proposalUrl ? (
+                    <a
+                      href={project.proposalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-center px-3 py-1.5 bg-csmju-primary text-white text-xs font-semibold rounded-lg hover:bg-csmju-primary-hover transition"
+                    >
+                      ดาวน์โหลด PDF ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">ยังไม่มีไฟล์</span>
+                  )}
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+                  <div>
+                    <span className="text-lg">📑</span>
+                    <h3 className="text-xs font-bold text-slate-800 mt-1">รายงานก้าวหน้า 3 บท</h3>
+                    <p className="text-[11px] text-slate-500">Progress Report (Ch 1-3)</p>
+                  </div>
+                  {project.progressReportUrl ? (
+                    <a
+                      href={project.progressReportUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-center px-3 py-1.5 bg-csmju-primary text-white text-xs font-semibold rounded-lg hover:bg-csmju-primary-hover transition"
+                    >
+                      ดาวน์โหลด PDF ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">ยังไม่มีไฟล์</span>
+                  )}
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+                  <div>
+                    <span className="text-lg">📘</span>
+                    <h3 className="text-xs font-bold text-slate-800 mt-1">เล่มรายงานฉบับสมบูรณ์</h3>
+                    <p className="text-[11px] text-slate-500">Full Thesis (Ch 1-5)</p>
+                  </div>
+                  {project.fullThesisPdfUrl || project.reportPdfUrl ? (
+                    <a
+                      href={project.fullThesisPdfUrl || project.reportPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-center px-3 py-1.5 bg-emerald-700 text-white text-xs font-semibold rounded-lg hover:bg-emerald-800 transition"
+                    >
+                      ดาวน์โหลดเล่มเต็ม ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">ยังไม่มีไฟล์</span>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* แสดงสาระสำคัญของแต่ละบททั้ง 5 บท */}
+            <section className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+              <h2 className="text-base font-bold text-csmju-primary">
+                📖 สรุปเนื้อหาสำคัญรายบท (Chapter Summaries)
+              </h2>
+
+              <div className="space-y-4">
+                <article className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-csmju-primary-soft text-csmju-primary text-xs rounded-md">
+                      บทที่ 1
+                    </span>
+                    บทนำ (Introduction)
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-slate-600 mt-2">
+                    {project.chaptersSummary?.chapter1 || 'ยังไม่มีการระบุสรุปย่อบทที่ 1'}
+                  </p>
+                </article>
+
+                <article className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-csmju-primary-soft text-csmju-primary text-xs rounded-md">
+                      บทที่ 2
+                    </span>
+                    ทฤษฎีและงานวิจัยที่เกี่ยวข้อง (Literature Review)
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-slate-600 mt-2">
+                    {project.chaptersSummary?.chapter2 || 'ยังไม่มีการระบุสรุปย่อบทที่ 2'}
+                  </p>
+                </article>
+
+                <article className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-csmju-primary-soft text-csmju-primary text-xs rounded-md">
+                      บทที่ 3
+                    </span>
+                    วิธีการดำเนินงานและการออกแบบระบบ (System Design & Methodology)
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-slate-600 mt-2">
+                    {project.chaptersSummary?.chapter3 || 'ยังไม่มีการระบุสรุปย่อบทที่ 3'}
+                  </p>
+                </article>
+
+                <article className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-csmju-primary-soft text-csmju-primary text-xs rounded-md">
+                      บทที่ 4
+                    </span>
+                    ผลการดำเนินงานและการทดสอบระบบ (Implementation & Testing)
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-slate-600 mt-2">
+                    {project.chaptersSummary?.chapter4 || 'ยังไม่มีการระบุสรุปย่อบทที่ 4'}
+                  </p>
+                </article>
+
+                <article className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-csmju-primary-soft text-csmju-primary text-xs rounded-md">
+                      บทที่ 5
+                    </span>
+                    สรุปผลการดำเนินงาน อภิปรายผล และข้อเสนอแนะ (Conclusion & Discussion)
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-slate-600 mt-2">
+                    {project.chaptersSummary?.chapter5 || 'ยังไม่มีการระบุสรุปย่อบทที่ 5'}
+                  </p>
+                </article>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* แท็บที่ 3: ชิ้นงานและสื่อส่งมอบ (Deliverables) */}
+        {activeTab === 'deliverables' && (
+          <div className="space-y-6">
+            <section className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+              <h2 className="text-base font-bold text-csmju-primary">
+                🖼️ โปสเตอร์ผลงานโครงงาน (Project Poster)
+              </h2>
+              {project.posterImageUrl ? (
+                <div className="space-y-3">
+                  <div className="max-h-96 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center">
+                    <img
+                      src={project.posterImageUrl}
+                      alt={`โปสเตอร์โครงงาน ${project.titleTh}`}
+                      className="w-full object-cover max-h-96"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <a
+                      href={project.posterImageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition"
+                    >
+                      ดูโปสเตอร์ความละเอียดสูง ↗
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs">
+                  ยังไม่ได้แนบลิงก์รูปภาพโปสเตอร์ผลงาน
+                </div>
               )}
-              {project.demoUrl && (
-                <a
-                  href={project.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-xl transition"
-                >
-                  <span>🚀</span> Live Demo
-                </a>
-              )}
-              {project.reportPdfUrl && (
-                <a
-                  href={project.reportPdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold rounded-xl transition"
-                >
-                  <span>📄</span> เล่มรายงานฉบับสมบูรณ์ (PDF)
-                </a>
-              )}
-            </div>
-          </section>
+            </section>
+
+            <section className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
+              <h2 className="text-base font-bold text-csmju-primary">
+                🔗 ลิงก์ระบบจริงและซอร์สโค้ด
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-800">📂 GitHub Repository</h3>
+                    <p className="text-[11px] text-slate-500 mt-1">ซอร์สโค้ดและคู่มือการพัฒนาทางเทคนิค</p>
+                  </div>
+                  {project.githubUrl ? (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition"
+                    >
+                      เปิด GitHub Repo ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">ไม่ระบุ</span>
+                  )}
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-800">🚀 Production Live Demo</h3>
+                    <p className="text-[11px] text-slate-500 mt-1">ระบบงานจริงสำหรับทดลองใช้งานบนคลาวด์</p>
+                  </div>
+                  {project.demoUrl ? (
+                    <a
+                      href={project.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition"
+                    >
+                      เข้าสู่ระบบจริง ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">ไม่ระบุ</span>
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
         )}
 
         {/* ส่วนแสดงความคิดเห็น/Feedback ที่ผ่านมา */}

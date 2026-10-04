@@ -47,6 +47,16 @@ model Project {
   semester          Int           @default(1)
   githubUrl         String?       @map("github_url")
   demoUrl           String?       @map("demo_url")
+  proposalUrl       String?       @map("proposal_url")
+  progressReportUrl String?       @map("progress_report_url")
+  fullThesisPdfUrl  String?       @map("full_thesis_pdf_url")
+  posterImageUrl    String?       @map("poster_image_url")
+  demoVideoUrl      String?       @map("demo_video_url")
+  chapter1Summary   String?       @map("chapter1_summary")
+  chapter2Summary   String?       @map("chapter2_summary")
+  chapter3Summary   String?       @map("chapter3_summary")
+  chapter4Summary   String?       @map("chapter4_summary")
+  chapter5Summary   String?       @map("chapter5_summary")
 
   members   ProjectMember[]
   tags      ProjectTag[]
