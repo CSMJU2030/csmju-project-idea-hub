@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getCurrentUser } from '../../../modules/showcase/auth/core-auth.adapter';
+import { getCurrentUser } from '../../../lib/auth';
 import { showcaseRepository } from '../../../modules/showcase/repositories/mock/showcase.mock-repository';
 import { ApprovalActionBox } from '../../../modules/showcase/components/approval-action-box';
 import { cardClass } from '../../../modules/showcase/components/ui';
@@ -20,7 +20,7 @@ export default async function AdvisorPortalPage() {
           </div>
           <h1 className="font-display text-headline-md font-bold text-error">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
           <p className="text-body-md text-on-surface-variant leading-[1.6]">
-            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาเท่านั้น (สามารถสลับ Role ใน core-auth.adapter.ts)
+            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาเท่านั้น
           </p>
           <Link href="/showcase" className="inline-block mt-4 text-label-md text-primary-container font-semibold hover:underline">
             ← กลับไปหน้ารายการผลงาน

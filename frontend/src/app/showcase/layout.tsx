@@ -1,4 +1,4 @@
-import { getCurrentUser } from '../../modules/showcase/auth/core-auth.adapter';
+import { getCurrentUser } from '../../lib/auth';
 import { ShowcaseAppShell } from '../../modules/showcase/components/showcase-app-shell';
 
 export default async function ShowcaseLayout({

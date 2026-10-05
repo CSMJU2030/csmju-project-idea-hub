@@ -83,11 +83,11 @@ export class SsoController {
   }
 
   private get subsystemId(): string {
-    return this.config.get<string>('subsystemId', 'csmju-demo-subsystem');
+    return this.config.get<string>('subsystemId', 'csmju-project-idea-hub');
   }
 
   private get coreHubWebUrl(): string {
-    return this.config.get<string>('coreHub.webUrl', 'http://localhost:3100');
+    return this.config.get<string>('coreHub.webUrl', 'http://localhost:3000');
   }
 
   private get secure(): boolean {

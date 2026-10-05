@@ -21,9 +21,6 @@ export default async function AdminDashboardPage() {
           <p className="text-body-md text-on-surface-variant leading-[1.6]">
             {res.message || 'หน้านี้สงวนไว้สำหรับผู้ดูแลระบบ (ADMIN) เท่านั้น'}
           </p>
-          <p className="text-caption text-secondary mt-1">
-            (สำหรับทดสอบ: ให้สลับ role เป็น &apos;ADMIN&apos; ใน core-auth.adapter.ts)
-          </p>
           <Link
             href="/showcase"
             className="inline-block mt-4 text-label-md text-primary-container font-semibold hover:underline"

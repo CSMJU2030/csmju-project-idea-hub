@@ -1,6 +1,6 @@
 'use server';
 
-import { getCurrentUser } from '../auth/core-auth.adapter';
+import { getCurrentUser } from '../../../lib/auth';
 import { canReviewProject } from '../auth/permissions';
 import { showcaseRepository } from '../repositories/mock/showcase.mock-repository';
 import { ActionResponse, Project } from '../types/domain';

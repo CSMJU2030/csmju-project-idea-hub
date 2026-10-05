@@ -1,7 +1,7 @@
 // src/app/showcase/portfolio/[core_user_id]/page.tsx
 
 import Link from 'next/link';
-import { getCurrentUser } from '../../../../modules/showcase/auth/core-auth.adapter';
+import { getCurrentUser } from '../../../../lib/auth';
 import { showcaseRepository } from '../../../../modules/showcase/repositories/mock/showcase.mock-repository';
 import { ProjectCard } from '../../../../modules/showcase/components/project-card';
 import { cardClass } from '../../../../modules/showcase/components/ui';

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCurrentUser } from '../../../../modules/showcase/auth/core-auth.adapter';
+import { getCurrentUser } from '../../../../lib/auth';
 import { showcaseRepository } from '../../../../modules/showcase/repositories/mock/showcase.mock-repository';
 import { canEditProject } from '../../../../modules/showcase/auth/permissions';
 import { ProjectEditForm } from '../../../../modules/showcase/components/project-edit-form';
