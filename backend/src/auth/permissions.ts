@@ -44,14 +44,19 @@ const ALUMNI_PERMISSIONS: Permission[] = [
   Permission.FEEDBACK_CREATE,
 ];
 
-const STAFF_PERMISSIONS: Permission[] = [
+const ADVISOR_PERMISSIONS: Permission[] = [
   Permission.PROJECT_READ,
-  Permission.PROJECT_CREATE,
   Permission.PROJECT_REVIEW,
   Permission.IDEA_READ,
   Permission.IDEA_CREATE,
   Permission.FEEDBACK_READ,
   Permission.FEEDBACK_CREATE,
+];
+
+const STAFF_PERMISSIONS: Permission[] = [
+  Permission.PROJECT_READ,
+  Permission.IDEA_READ,
+  Permission.FEEDBACK_READ,
 ];
 
 const ADMIN_PERMISSIONS: Permission[] = Object.values(Permission);
@@ -60,6 +65,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<SubsystemRole, readonly Permissio
   Object.freeze({
     [SubsystemRole.STUDENT]: Object.freeze(STUDENT_PERMISSIONS),
     [SubsystemRole.ALUMNI]: Object.freeze(ALUMNI_PERMISSIONS),
+    [SubsystemRole.ADVISOR]: Object.freeze(ADVISOR_PERMISSIONS),
     [SubsystemRole.STAFF]: Object.freeze(STAFF_PERMISSIONS),
     [SubsystemRole.ADMIN]: Object.freeze(ADMIN_PERMISSIONS),
   });

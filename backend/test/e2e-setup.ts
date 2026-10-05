@@ -15,3 +15,5 @@ process.env.CORE_HUB_AUDIENCE = 'csmju2030';
 process.env.JWKS_CACHE_TTL_MS = '60000';
 process.env.JWKS_MIN_REFRESH_INTERVAL_MS = '1';
 process.env.SUBSYSTEM_ID = 'csmju-project-idea-hub';
+// Core Hub's web app: only ever a redirect target, never dialled by the tests.
+process.env.CORE_HUB_WEB_URL = 'https://core-hub-web.test';

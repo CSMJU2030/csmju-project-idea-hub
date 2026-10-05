@@ -87,8 +87,12 @@ class Table {
     }
     const loaded: Row = { ...row };
     for (const [name, wanted] of Object.entries(include)) {
-      if (wanted && this.relations[name]) {
-        loaded[name] = this.relations[name](row);
+      if (wanted) {
+        if (this.relations[name]) {
+          loaded[name] = this.relations[name](row);
+        } else if (loaded[name] === undefined) {
+          loaded[name] = [];
+        }
       }
     }
     return loaded;
@@ -157,8 +161,17 @@ class Table {
       }
     }
 
+    const processedData: Row = { ...data };
+    for (const [key, value] of Object.entries(processedData)) {
+      if (value && typeof value === 'object' && 'create' in value) {
+        processedData[key] = Array.isArray((value as Row).create)
+          ? (value as Row).create
+          : [(value as Row).create];
+      }
+    }
+
     const now = new Date();
-    const row = { id: randomUUID(), ...this.defaults(), ...data, createdAt: now, updatedAt: now };
+    const row = { id: randomUUID(), ...this.defaults(), ...processedData, createdAt: now, updatedAt: now };
     this.rows.push(row);
     return this.withInclude(row, include);
   }
@@ -197,6 +210,25 @@ class Table {
 
 /** Rooms live in (fake) Core Hub, so the subsystem database holds bookings only. */
 export class InMemoryPrisma {
+  project = new Table([], [], () => ({
+    status: 'PROPOSED',
+    semester: 1,
+    members: [],
+    tags: [],
+    feedbacks: [],
+    approvals: [],
+  }));
+  projectMember = new Table([], []);
+  projectTag = new Table([], []);
+  projectFeedback = new Table([], []);
+  projectApproval = new Table([], []);
+  idea = new Table([], [], () => ({
+    status: 'OPEN',
+    votes: [],
+    comments: [],
+  }));
+  ideaVote = new Table([], []);
+  ideaComment = new Table([], []);
   booking = new Table([], [], () => ({
     status: 'PENDING',
     purpose: null,
@@ -211,6 +243,14 @@ export class InMemoryPrisma {
   async onModuleDestroy(): Promise<void> {}
 
   reset(): void {
+    this.project.rows = [];
+    this.projectMember.rows = [];
+    this.projectTag.rows = [];
+    this.projectFeedback.rows = [];
+    this.projectApproval.rows = [];
+    this.idea.rows = [];
+    this.ideaVote.rows = [];
+    this.ideaComment.rows = [];
     this.booking.rows = [];
   }
 }

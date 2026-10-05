@@ -18,6 +18,9 @@ export class MeController {
       email: user.email,
       coreRole: user.coreRole,
       subsystemRole: user.subsystemRole,
+      session: {
+        expiresAt: user.exp !== undefined ? new Date(user.exp * 1000).toISOString() : null,
+      },
     };
   }
 }

@@ -3,6 +3,7 @@ export enum SubsystemRole {
   STUDENT = 'STUDENT',
   ALUMNI = 'ALUMNI',
   STAFF = 'STAFF',
+  ADVISOR = 'ADVISOR',
   ADMIN = 'ADMIN',
 }
 
@@ -21,6 +22,8 @@ export interface CoreHubIdentity {
   sessionId?: string;
   /** Result of the subsystem's own role mapping. */
   subsystemRole: SubsystemRole;
+  /** When the verified token - and with it this session - expires (`exp`, epoch seconds). */
+  exp?: number;
 }
 
 export interface CoreHubTokenPayload {
@@ -32,4 +35,6 @@ export interface CoreHubTokenPayload {
   aud: string | string[];
   iat?: number;
   exp?: number;
+  /** Authorized party: the registered subsystem the token was issued for (when Core Hub sets it). */
+  azp?: string;
 }

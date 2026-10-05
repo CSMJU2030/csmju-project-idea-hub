@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 export interface CoreHubTokenPayload {
   sub: string;
   email: string;
-  role: 'student' | 'alumni' | 'staff' | 'admin';
+  role: 'student' | 'alumni' | 'staff' | 'admin' | 'lecturer' | 'superadmin' | 'guest';
   sid: string;
   iss: string;
   aud: string;

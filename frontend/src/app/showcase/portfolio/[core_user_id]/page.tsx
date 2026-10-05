@@ -1,4 +1,4 @@
-// src/app/showcase/portfolio/[studentId]/page.tsx
+// src/app/showcase/portfolio/[core_user_id]/page.tsx
 
 import Link from 'next/link';
 import { getCurrentUser } from '../../../../modules/showcase/auth/core-auth.adapter';
@@ -8,23 +8,23 @@ import { cardClass } from '../../../../modules/showcase/components/ui';
 import { ArrowBackIcon, DescriptionIcon } from '../../../../modules/showcase/components/icons';
 
 interface PageProps {
-  params: Promise<{ studentId: string }>;
+  params: Promise<{ core_user_id: string }>;
 }
 
 export default async function StudentPortfolioPage({ params }: PageProps) {
-  const { studentId } = await params;
+  const { core_user_id } = await params;
   const currentUser = await getCurrentUser();
 
   // 1. ดึงผลงานทั้งหมดในระบบ
   const allProjects = await showcaseRepository.findProjects();
 
-  // 2. กรองผลงานที่ตรงกับ studentId
+  // 2. กรองผลงานที่ตรงกับ core_user_id
   const studentProjects = allProjects.filter((project) =>
-    project.members.some((member) => member.studentId === studentId)
+    project.members.some((member) => member.studentId === core_user_id)
   );
 
-  const studentInfo = studentProjects[0]?.members.find((m) => m.studentId === studentId);
-  const isOwnerViewing = currentUser?.id === studentId;
+  const studentInfo = studentProjects[0]?.members.find((m) => m.studentId === core_user_id);
+  const isOwnerViewing = currentUser?.id === core_user_id;
 
   const visibleProjects = isOwnerViewing
     ? studentProjects
@@ -52,10 +52,10 @@ export default async function StudentPortfolioPage({ params }: PageProps) {
               Student Portfolio
             </span>
             <h1 className="font-display text-headline-lg font-bold text-on-surface mt-2">
-              {studentInfo?.name || `แฟ้มสะสมผลงาน: ${studentId}`}
+              {studentInfo?.name || `แฟ้มสะสมผลงาน: ${core_user_id}`}
             </h1>
             <p className="text-body-md text-secondary mt-1">
-              รหัสนักศึกษา: <span className="font-mono">{studentId}</span>
+              รหัสผู้ใช้งาน: <span className="font-mono">{core_user_id}</span>
             </p>
           </div>
 

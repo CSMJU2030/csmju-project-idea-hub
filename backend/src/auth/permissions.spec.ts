@@ -34,12 +34,24 @@ describe('Subsystem permission model (spec §15, §16, G0 Scoping)', () => {
     });
   });
 
+  describe('ADVISOR', () => {
+    it('sees projects, shares ideas, gives feedback and reviews submissions', () => {
+      const role = SubsystemRole.ADVISOR;
+      expect(can(role, Permission.PROJECT_READ)).toBe(true);
+      expect(can(role, Permission.PROJECT_REVIEW)).toBe(true);
+      expect(can(role, Permission.IDEA_READ)).toBe(true);
+      expect(can(role, Permission.IDEA_CREATE)).toBe(true);
+      expect(can(role, Permission.FEEDBACK_READ)).toBe(true);
+      expect(can(role, Permission.FEEDBACK_CREATE)).toBe(true);
+    });
+  });
+
   describe('STAFF', () => {
-    it('sees projects and reviews pending submissions', () => {
+    it('is read-only: can view projects and feedback but cannot review', () => {
       const role = SubsystemRole.STAFF;
       expect(can(role, Permission.PROJECT_READ)).toBe(true);
-      expect(can(role, Permission.PROJECT_CREATE)).toBe(true);
-      expect(can(role, Permission.PROJECT_REVIEW)).toBe(true);
+      expect(can(role, Permission.PROJECT_CREATE)).toBe(false);
+      expect(can(role, Permission.PROJECT_REVIEW)).toBe(false);
       expect(can(role, Permission.IDEA_READ)).toBe(true);
       expect(can(role, Permission.FEEDBACK_READ)).toBe(true);
     });

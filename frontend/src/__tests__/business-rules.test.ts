@@ -182,6 +182,13 @@ describe('2. Authorization & Ownership Rules (403 Forbidden Cases)', () => {
     assert.equal(canReviewProject(adminUser, mockProject), true);
     assert.equal(canReviewProject(otherTeacherUser, mockProject), false); // 403 Forbidden
     assert.equal(canReviewProject(ownerUser, mockProject), false); // นักศึกษาไม่มีสิทธิ์อนุมัติงานตัวเอง
+    const staffUser: UserContext = {
+      id: 'staff-001',
+      name: 'เจ้าหน้าที่',
+      email: 'staff@mju.ac.th',
+      role: 'STAFF',
+    };
+    assert.equal(canReviewProject(staffUser, mockProject), false); // เจ้าหน้าที่ไม่มีสิทธิ์อนุมัติ
   });
 });
 

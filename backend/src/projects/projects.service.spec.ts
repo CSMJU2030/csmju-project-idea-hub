@@ -42,11 +42,11 @@ describe('ProjectsService', () => {
     subsystemRole: SubsystemRole.STUDENT,
   };
 
-  const staffUser: CoreHubIdentity = {
-    id: 'user-staff-5555',
+  const advisorUser: CoreHubIdentity = {
+    id: 'user-advisor-5555',
     email: 'advisor@mju.ac.th',
     coreRole: 'lecturer',
-    subsystemRole: SubsystemRole.STAFF,
+    subsystemRole: SubsystemRole.ADVISOR,
   };
 
   const mockProject = {
@@ -218,7 +218,7 @@ describe('ProjectsService', () => {
       expect(result.titleTh).toBe('โครงงานทดสอบที่แก้ไขแล้ว');
     });
 
-    it('allows staff to update any project', async () => {
+    it('allows advisor to update any project', async () => {
       prisma.project.findUnique.mockResolvedValue(mockProject);
       prisma.project.update.mockResolvedValue({
         ...mockProject,
@@ -229,7 +229,7 @@ describe('ProjectsService', () => {
         status: ProjectStatus.APPROVED,
       };
 
-      const result = await service.update(mockProject.id, dto, staffUser);
+      const result = await service.update(mockProject.id, dto, advisorUser);
 
       expect(prisma.project.update).toHaveBeenCalled();
       expect(result.status).toBe(ProjectStatus.APPROVED);
@@ -319,7 +319,7 @@ describe('ProjectsService', () => {
       const result = await service.reviewProject(
         mockProject.id,
         { action: 'APPROVED', comment: 'อนุมัติ' },
-        staffUser,
+        advisorUser,
       );
 
       expect(prisma.projectApproval.create).toHaveBeenCalled();

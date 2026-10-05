@@ -37,9 +37,12 @@ describe('PermissionsGuard - authorization tests (spec §15, §36)', () => {
     expect(guard.canActivate(contextFor(identity(SubsystemRole.STUDENT)))).toBe(true);
   });
 
-  it('allows STAFF to review a project', () => {
+  it('allows ADVISOR to review a project and denies STAFF', () => {
     requirePermissions(Permission.PROJECT_REVIEW);
-    expect(guard.canActivate(contextFor(identity(SubsystemRole.STAFF)))).toBe(true);
+    expect(guard.canActivate(contextFor(identity(SubsystemRole.ADVISOR)))).toBe(true);
+    expect(() => guard.canActivate(contextFor(identity(SubsystemRole.STAFF)))).toThrow(
+      expect.objectContaining({ status: 403 }),
+    );
   });
 
   it('denies a STUDENT reviewing a project with 403', () => {

@@ -20,9 +20,9 @@ export const CORE_ROLE_TO_SUBSYSTEM_ROLE: Readonly<Record<string, SubsystemRole>
   student: SubsystemRole.STUDENT,
   alumni: SubsystemRole.ALUMNI,
   staff: SubsystemRole.STAFF,
-  lecturer: SubsystemRole.STAFF,
-  guest: SubsystemRole.ALUMNI,
+  lecturer: SubsystemRole.ADVISOR,
   admin: SubsystemRole.ADMIN,
+  superadmin: SubsystemRole.ADMIN,
 });
 
 /**

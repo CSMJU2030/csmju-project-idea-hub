@@ -135,7 +135,7 @@ export class ProjectsService {
     const existing = await this.findById(id);
 
     const isPrivileged =
-      user.subsystemRole === SubsystemRole.ADMIN || user.subsystemRole === SubsystemRole.STAFF;
+      user.subsystemRole === SubsystemRole.ADMIN || user.subsystemRole === SubsystemRole.ADVISOR;
     if (!isPrivileged && existing.ownerCoreUserId !== user.id) {
       throw AppException.forbidden('You do not have permission to modify this project');
     }
@@ -176,7 +176,7 @@ export class ProjectsService {
     const existing = await this.findById(id);
 
     const isPrivileged =
-      user.subsystemRole === SubsystemRole.ADMIN || user.subsystemRole === SubsystemRole.STAFF;
+      user.subsystemRole === SubsystemRole.ADMIN || user.subsystemRole === SubsystemRole.ADVISOR;
     if (!isPrivileged && existing.ownerCoreUserId !== user.id) {
       throw AppException.forbidden('You do not have permission to delete this project');
     }

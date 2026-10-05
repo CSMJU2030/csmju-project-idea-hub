@@ -2,9 +2,13 @@ import { cookies } from 'next/headers';
 import { UserContext } from '../types/domain';
 import { verifyCoreHubToken } from './jwt-verifier';
 
-const CORE_ROLE_MAP: Record<string, UserContext['role']> = {
+const SESSION_COOKIE_NAME = 'csmju_project_idea_hub_access_token';
+
+const CORE_ROLE_MAP: Partial<Record<string, UserContext['role']>> = {
   admin: 'ADMIN',
-  staff: 'TEACHER',
+  superadmin: 'ADMIN',
+  lecturer: 'TEACHER',
+  staff: 'STAFF',
   student: 'STUDENT',
   alumni: 'ALUMNI',
 };
@@ -17,16 +21,22 @@ const CORE_ROLE_MAP: Record<string, UserContext['role']> = {
 export async function getCurrentUser(): Promise<UserContext | null> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('core_hub_access_token')?.value;
+    const token =
+      cookieStore.get(SESSION_COOKIE_NAME)?.value ??
+      cookieStore.get('core_hub_access_token')?.value;
 
     if (token) {
       const verification = await verifyCoreHubToken(token);
       if (verification.isValid && verification.payload) {
+        const mappedRole = CORE_ROLE_MAP[verification.payload.role];
+        if (!mappedRole) {
+          return null;
+        }
         return {
           id: verification.payload.sub,
           name: verification.payload.email.split('@')[0],
           email: verification.payload.email,
-          role: CORE_ROLE_MAP[verification.payload.role] || 'STUDENT',
+          role: mappedRole,
         };
       }
     }

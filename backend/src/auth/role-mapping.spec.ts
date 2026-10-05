@@ -6,11 +6,16 @@ describe('Core role -> subsystem role mapping (spec §14)', () => {
     ['student', SubsystemRole.STUDENT],
     ['alumni', SubsystemRole.ALUMNI],
     ['staff', SubsystemRole.STAFF],
-    ['lecturer', SubsystemRole.STAFF],
-    ['guest', SubsystemRole.ALUMNI],
+    ['lecturer', SubsystemRole.ADVISOR],
     ['admin', SubsystemRole.ADMIN],
+    ['superadmin', SubsystemRole.ADMIN],
   ])('maps core role "%s" to %s', (coreRole, expected) => {
     expect(mapCoreRoleToSubsystemRole(coreRole)).toBe(expected);
+  });
+
+  it('rejects guest and unknown roles with null (leads to 403)', () => {
+    expect(mapCoreRoleToSubsystemRole('guest')).toBeNull();
+    expect(mapCoreRoleToSubsystemRole('finance-officer')).toBeNull();
   });
 
   it('is case and whitespace tolerant', () => {

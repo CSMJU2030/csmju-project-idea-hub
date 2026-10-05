@@ -5,7 +5,7 @@ export interface UserContext {
   id: string;
   name: string;
   email: string;
-  role: 'STUDENT' | 'TEACHER' | 'ALUMNI' | 'ADMIN';
+  role: 'STUDENT' | 'TEACHER' | 'ALUMNI' | 'ADMIN' | 'STAFF';
 }
 
 export interface ProjectMember {

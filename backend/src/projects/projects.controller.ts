@@ -82,7 +82,7 @@ export class ProjectsController {
     return this.projectsService.getFeedbacks(id);
   }
 
-  @Post(':id/reviews')
+  @Post([':id/reviews', ':id/review'])
   @RequirePermissions(Permission.PROJECT_REVIEW)
   async reviewProject(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
