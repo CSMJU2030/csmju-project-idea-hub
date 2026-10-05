@@ -21,7 +21,7 @@ probes:
   create:
     path: /api/v1/projects
     allowed_role: staff
-    denied_role: student
+    denied_role: alumni
     invalid_body:
       titleTh: ""
     valid_body:

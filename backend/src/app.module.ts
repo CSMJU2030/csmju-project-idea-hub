@@ -11,6 +11,7 @@ import { validateEnv } from './config/env.validation';
 import { CoreHubModule } from './core-hub/core-hub.module';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     HealthModule,
     CoreHubModule,
+    ProjectsModule,
   ],
   providers: [
     // Every route is authenticated unless explicitly marked @Public().

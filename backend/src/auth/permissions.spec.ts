@@ -38,6 +38,7 @@ describe('Subsystem permission model (spec §15, §16, G0 Scoping)', () => {
     it('sees projects and reviews pending submissions', () => {
       const role = SubsystemRole.STAFF;
       expect(can(role, Permission.PROJECT_READ)).toBe(true);
+      expect(can(role, Permission.PROJECT_CREATE)).toBe(true);
       expect(can(role, Permission.PROJECT_REVIEW)).toBe(true);
       expect(can(role, Permission.IDEA_READ)).toBe(true);
       expect(can(role, Permission.FEEDBACK_READ)).toBe(true);

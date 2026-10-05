@@ -46,6 +46,7 @@ const ALUMNI_PERMISSIONS: Permission[] = [
 
 const STAFF_PERMISSIONS: Permission[] = [
   Permission.PROJECT_READ,
+  Permission.PROJECT_CREATE,
   Permission.PROJECT_REVIEW,
   Permission.IDEA_READ,
   Permission.IDEA_CREATE,
