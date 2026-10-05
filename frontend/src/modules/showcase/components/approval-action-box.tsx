@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { reviewProjectAction } from '../actions/approval.actions';
+import { cardClass, dangerButtonClass, inputClass, primaryButtonClass, secondaryButtonClass } from './ui';
+import { CheckIcon, CloseIcon } from './icons';
 
 interface ApprovalActionBoxProps {
   projectId: string;
@@ -52,13 +54,13 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
   return (
     <section 
       aria-labelledby="approval-heading" 
-      className="bg-csmju-surface-muted border border-csmju-primary/20 rounded-xl p-6 text-csmju-text-body"
+      className={`${cardClass} p-6 border-primary-container/20`}
     >
       <div className="flex flex-col gap-2">
-        <h3 id="approval-heading" className="text-lg font-bold text-csmju-primary">
+        <h3 id="approval-heading" className="font-display text-headline-md font-bold text-on-surface">
           การตรวจสอบและรับรองผลงาน (สำหรับอาจารย์ที่ปรึกษา)
         </h3>
-        <p className="text-sm leading-[1.6]">
+        <p className="text-body-md text-on-surface-variant leading-[1.6]">
           โปรดตรวจสอบรายละเอียดเอกสารและลิงก์ผลงาน เมื่ออนุมัติแล้ว โครงงานจะถูกนำไปแสดงในคลังผลงานสาธารณะทันที
         </p>
       </div>
@@ -66,13 +68,17 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
       {feedbackMessage && (
         <div
           role="alert"
-          className={`mt-4 p-3 rounded-lg text-sm font-medium border flex items-center gap-2 ${
+          className={`mt-4 p-4 rounded-lg text-body-md font-medium border flex items-center gap-2 ${
             feedbackMessage.isError
-              ? 'bg-red-50 text-red-700 border-red-200'
-              : 'bg-green-50 text-green-700 border-green-200'
+              ? 'bg-error-container text-on-error-container border-error/20'
+              : 'bg-success/10 text-emerald-700 border-success/20'
           }`}
         >
-          <span>{feedbackMessage.isError ? '⚠️' : '✅'}</span>
+          {feedbackMessage.isError ? (
+            <CloseIcon className="h-5 w-5 text-error shrink-0" />
+          ) : (
+            <CheckIcon className="h-5 w-5 text-success shrink-0" />
+          )}
           <span>{feedbackMessage.text}</span>
         </div>
       )}
@@ -83,25 +89,27 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
             type="button"
             disabled={isPending}
             onClick={handleApprove}
-            className="px-5 py-2.5 bg-csmju-primary text-white text-sm font-semibold rounded-lg hover:bg-csmju-primary-hover focus:outline-none focus:ring-2 focus:ring-csmju-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className={primaryButtonClass}
           >
-            {isPending ? 'กำลังบันทึก...' : 'อนุมัติผลงาน (Approve)'}
+            <CheckIcon className="h-4 w-4" />
+            <span>{isPending ? 'กำลังบันทึก...' : 'อนุมัติผลงาน (Approve)'}</span>
           </button>
 
           <button
             type="button"
             disabled={isPending}
             onClick={() => setShowRejectForm(true)}
-            className="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className={secondaryButtonClass}
           >
-            ส่งกลับแก้ไข / ปฏิเสธ (Reject)
+            <CloseIcon className="h-4 w-4" />
+            <span>ส่งกลับแก้ไข / ปฏิเสธ (Reject)</span>
           </button>
         </div>
       ) : (
         <form onSubmit={handleReject} className="mt-5 space-y-4">
           <div>
-            <label htmlFor="rejectionReason" className="block text-sm font-semibold mb-1 text-slate-700">
-              ระบุข้อเสนอแนะในการปรับปรุงแก้ไข <span className="text-red-500">*</span>
+            <label htmlFor="rejectionReason" className="block text-label-md font-semibold mb-1 text-on-surface">
+              ระบุข้อเสนอแนะในการปรับปรุงแก้ไข <span className="text-error">*</span>
             </label>
             <textarea
               id="rejectionReason"
@@ -111,15 +119,15 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="ระบุจุดที่ต้องปรับปรุง เช่น แก้ไขบทคัดย่อ หรือตรวจเช็กลิงก์ GitHub ที่เข้าถึงไม่ได้..."
-              className="w-full p-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary leading-[1.6]"
+              className={inputClass}
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               type="submit"
               disabled={isPending || rejectionReason.trim().length < 5}
-              className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className={dangerButtonClass}
             >
               {isPending ? 'กำลังส่งข้อมูล...' : 'ยืนยันการส่งกลับแก้ไข'}
             </button>
@@ -127,7 +135,7 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
               type="button"
               disabled={isPending}
               onClick={() => setShowRejectForm(false)}
-              className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300 transition"
+              className={secondaryButtonClass}
             >
               ยกเลิก
             </button>

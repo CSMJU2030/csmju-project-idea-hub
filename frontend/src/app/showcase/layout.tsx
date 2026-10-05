@@ -1,17 +1,12 @@
-import Link from "next/link";
+import { getCurrentUser } from '../../modules/showcase/auth/core-auth.adapter';
+import { ShowcaseAppShell } from '../../modules/showcase/components/showcase-app-shell';
 
-export default function ShowcaseLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <div className="shell">
-      <header className="site-header">
-        <div className="site-header-inner">
-          <Link href="/showcase" className="brand">CSMJU Showcase<small>สาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้</small></Link>
-          <nav className="main-nav" aria-label="เมนูหลัก">
-            <Link href="/showcase">ผลงาน</Link><Link href="/showcase/ideas">คลังไอเดีย</Link><Link href="/showcase/portfolio/demo">Portfolio</Link><Link href="/showcase/new">ส่งผลงาน</Link>
-          </nav>
-        </div>
-      </header>
-      <main>{children}</main>
-    </div>
-  );
+export default async function ShowcaseLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const user = await getCurrentUser();
+
+  return <ShowcaseAppShell user={user}>{children}</ShowcaseAppShell>;
 }

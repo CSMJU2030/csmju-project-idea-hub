@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { createProjectAction, checkTitleDuplicateAction } from '../actions/project.actions';
 import { DuplicateCheckResult } from '../utils/anti-duplicate';
 
+import { cardClass, primaryButtonClass, secondaryButtonClass, inputClass } from './ui';
+import { CheckIcon, CloseIcon } from './icons';
+
 interface FormState {
   titleTh: string;
   titleEn: string;
@@ -145,13 +148,13 @@ export function ProjectForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 text-csmju-text-body" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-6 text-on-surface" noValidate>
       {generalError && (
         <div
           role="alert"
-          className="p-4 rounded-xl bg-red-50 text-red-700 border border-red-200 text-sm font-medium flex items-center gap-2"
+          className="p-4 rounded-xl bg-error-container text-on-error-container border border-error/20 text-body-md font-medium flex items-center gap-2"
         >
-          <span>⚠️</span>
+          <CloseIcon className="h-5 w-5 text-error shrink-0" />
           <span>{generalError}</span>
         </div>
       )}
@@ -159,9 +162,9 @@ export function ProjectForm() {
       {successMessage && (
         <div
           role="status"
-          className="p-4 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-medium flex items-center gap-2"
+          className="p-4 rounded-xl bg-success/10 text-emerald-700 border border-success/20 text-body-md font-medium flex items-center gap-2"
         >
-          <span>✅</span>
+          <CheckIcon className="h-5 w-5 text-success shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
@@ -170,23 +173,23 @@ export function ProjectForm() {
         <div
           role="region"
           aria-live="polite"
-          className="p-4 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 text-sm space-y-1"
+          className="p-4 rounded-xl bg-amber-100 text-amber-800 border border-amber-300 text-body-md space-y-1"
         >
           <p className="font-bold flex items-center gap-1.5">
-            <span>⚠️</span> ระบบตรวจพบหัวข้อที่มีความคล้ายคลึงกัน ({duplicateWarning.score}%)
+            <span className="h-2 w-2 rounded-full bg-amber-500 inline-block" /> ระบบตรวจพบหัวข้อที่มีความคล้ายคลึงกัน ({duplicateWarning.score}%)
           </p>
-          <p className="text-xs text-amber-700">
+          <p className="text-label-sm text-amber-700">
             ผลงานใกล้เคียง: <strong>{duplicateWarning.matchedTitle}</strong>
           </p>
-          <p className="text-xs text-amber-600">
+          <p className="text-label-sm text-amber-600">
             กรุณาตรวจสอบว่าผลงานของคุณไม่มีขอบเขตและเนื้อหาซ้ำซ้อนกับงานเดิม
           </p>
         </div>
       )}
 
       {/* กลุ่มข้อมูลทั่วไป */}
-      <fieldset className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
-        <legend className="text-base font-bold text-csmju-primary px-2">1. ข้อมูลผลงานทั่วไป</legend>
+      <fieldset className={`${cardClass} p-6 space-y-4`}>
+        <legend className="font-display text-headline-md font-bold text-on-surface px-2">1. ข้อมูลผลงานทั่วไป</legend>
 
         <div>
           <label htmlFor="titleTh" className="block text-sm font-semibold mb-1">
@@ -550,12 +553,12 @@ export function ProjectForm() {
         </div>
       </fieldset>
 
-      <div className="flex items-center justify-end gap-3 pt-2">
+      <div className="flex items-center justify-end gap-3 pt-4">
         <button
           type="button"
           onClick={() => router.back()}
           disabled={isPending}
-          className="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition"
+          className={secondaryButtonClass}
         >
           ยกเลิก
         </button>
@@ -563,7 +566,7 @@ export function ProjectForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="px-6 py-2.5 bg-csmju-primary text-white text-sm font-semibold rounded-xl hover:bg-csmju-primary-hover focus:outline-none focus:ring-2 focus:ring-csmju-primary focus:ring-offset-2 disabled:opacity-50 transition shadow-xs"
+          className={primaryButtonClass}
         >
           {isPending ? 'กำลังบันทึกข้อมูล...' : 'ส่งผลงานเพื่อรอการอนุมัติ'}
         </button>

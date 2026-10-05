@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { cardClass, inputClass, primaryButtonClass, secondaryButtonClass } from './ui';
 
 interface ProjectFilterProps {
   categories: string[];
@@ -42,14 +43,14 @@ export function ProjectFilter({ categories, academicYears }: ProjectFilterProps)
   return (
     <form
       onSubmit={handleFilter}
-      className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs mb-8"
+      className={`${cardClass} p-6 shadow-sm mb-8`}
       role="search"
       aria-label="ค้นหาและกรองโปรเจกต์"
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* ค้นหาจากคำสำคัญ */}
         <div className="md:col-span-2">
-          <label htmlFor="keyword" className="block text-sm font-semibold text-csmju-text-body mb-1">
+          <label htmlFor="keyword" className="block text-label-md font-semibold text-on-surface mb-1">
             ค้นหา (ชื่อผลงาน, คำสำคัญ, Tech Stack)
           </label>
           <input
@@ -58,20 +59,20 @@ export function ProjectFilter({ categories, academicYears }: ProjectFilterProps)
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="เช่น AI, IoT, Next.js, ภาษาไทย..."
-            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
+            className={inputClass}
           />
         </div>
 
         {/* หมวดหมู่ */}
         <div>
-          <label htmlFor="category" className="block text-sm font-semibold text-csmju-text-body mb-1">
+          <label htmlFor="category" className="block text-label-md font-semibold text-on-surface mb-1">
             หมวดหมู่
           </label>
           <select
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary bg-white"
+            className={inputClass}
           >
             <option value="">ทั้งหมด</option>
             {categories.map((c) => (
@@ -84,14 +85,14 @@ export function ProjectFilter({ categories, academicYears }: ProjectFilterProps)
 
         {/* ปีการศึกษา */}
         <div>
-          <label htmlFor="year" className="block text-sm font-semibold text-csmju-text-body mb-1">
+          <label htmlFor="year" className="block text-label-md font-semibold text-on-surface mb-1">
             ปีการศึกษา (พ.ศ.)
           </label>
           <select
             id="year"
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary bg-white"
+            className={inputClass}
           >
             <option value="">ทุกปีการศึกษา</option>
             {academicYears.map((y) => (
@@ -103,12 +104,12 @@ export function ProjectFilter({ categories, academicYears }: ProjectFilterProps)
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-end gap-2">
+      <div className="mt-6 flex items-center justify-end gap-3">
         <button
           type="button"
           onClick={handleReset}
           disabled={isPending}
-          className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900 border border-transparent rounded-lg hover:bg-slate-100 transition focus:outline-none focus:ring-2 focus:ring-slate-300"
+          className={secondaryButtonClass}
         >
           ล้างตัวกรอง
         </button>
@@ -116,7 +117,7 @@ export function ProjectFilter({ categories, academicYears }: ProjectFilterProps)
         <button
           type="submit"
           disabled={isPending}
-          className="px-5 py-2 bg-csmju-primary text-white text-sm font-semibold rounded-lg hover:bg-csmju-primary-hover focus:outline-none focus:ring-2 focus:ring-csmju-primary focus:ring-offset-2 disabled:opacity-50 transition"
+          className={primaryButtonClass}
         >
           {isPending ? 'กำลังค้นหา...' : 'ค้นหาผลงาน'}
         </button>

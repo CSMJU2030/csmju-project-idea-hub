@@ -4,6 +4,8 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Project } from '../types/domain';
 import { updateProjectAction, deleteProjectAction } from '../actions/project.actions';
+import { cardClass, primaryButtonClass, secondaryButtonClass, dangerButtonClass } from './ui';
+import { CheckIcon, CloseIcon, DeleteIcon } from './icons';
 
 interface ProjectEditFormProps {
   project: Project;
@@ -118,13 +120,13 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 text-csmju-text-body" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-6 text-on-surface" noValidate>
       {generalError && (
         <div
           role="alert"
-          className="p-4 rounded-xl bg-red-50 text-red-700 border border-red-200 text-sm font-medium flex items-center gap-2"
+          className="p-4 rounded-xl bg-error-container text-on-error-container border border-error/20 text-body-md font-medium flex items-center gap-2"
         >
-          <span>⚠️</span>
+          <CloseIcon className="h-5 w-5 text-error shrink-0" />
           <span>{generalError}</span>
         </div>
       )}
@@ -132,16 +134,16 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
       {successMessage && (
         <div
           role="status"
-          className="p-4 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-medium flex items-center gap-2"
+          className="p-4 rounded-xl bg-success/10 text-emerald-700 border border-success/20 text-body-md font-medium flex items-center gap-2"
         >
-          <span>✅</span>
+          <CheckIcon className="h-5 w-5 text-success shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {/* 1. ข้อมูลทั่วไป */}
-      <fieldset className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4">
-        <legend className="text-base font-bold text-csmju-primary px-2">1. ข้อมูลผลงานทั่วไป</legend>
+      <fieldset className={`${cardClass} p-6 space-y-4`}>
+        <legend className="font-display text-headline-md font-bold text-on-surface px-2">1. ข้อมูลผลงานทั่วไป</legend>
 
         <div>
           <label htmlFor="titleTh" className="block text-sm font-semibold mb-1">
@@ -453,14 +455,15 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
         </div>
       </fieldset>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
         <button
           type="button"
           onClick={handleDelete}
           disabled={isPending}
-          className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition border border-red-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className={`${dangerButtonClass} flex items-center justify-center gap-2`}
         >
-          🗑️ ลบโครงงานนี้
+          <DeleteIcon className="h-4 w-4" />
+          <span>ลบโครงงานนี้</span>
         </button>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -468,7 +471,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
             type="button"
             onClick={() => router.back()}
             disabled={isPending}
-            className="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition"
+            className={secondaryButtonClass}
           >
             ยกเลิก
           </button>
@@ -476,7 +479,7 @@ export function ProjectEditForm({ project }: ProjectEditFormProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="px-6 py-2.5 bg-csmju-primary text-white text-sm font-semibold rounded-xl hover:bg-csmju-primary-hover focus:outline-none focus:ring-2 focus:ring-csmju-primary focus:ring-offset-2 disabled:opacity-50 transition shadow-xs"
+            className={primaryButtonClass}
           >
             {isPending ? 'กำลังบันทึกข้อมูล...' : 'บันทึกการเปลี่ยนแปลง'}
           </button>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Project } from '../types/domain';
+import { cardClass } from './ui';
 
 interface ProjectCardProps {
   project: Project;
@@ -7,25 +8,25 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <article className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition-shadow">
+    <article className={`${cardClass} p-6 flex flex-col justify-between hover:shadow-md transition-shadow duration-200 group`}>
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-xs font-semibold px-2.5 py-1 bg-csmju-primary-soft text-csmju-primary rounded-md">
+          <span className="inline-flex items-center rounded-full bg-primary-container/10 px-3 py-1 text-label-sm font-semibold text-primary-container">
             {project.category}
           </span>
-          <span className="text-xs text-slate-500 font-medium">
+          <span className="text-label-sm text-secondary font-medium">
             ปีการศึกษา {project.academicYear}
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-csmju-primary line-clamp-1">
+        <h3 className="font-display text-lg font-bold text-on-surface group-hover:text-primary-container transition-colors line-clamp-1">
           {project.titleTh}
         </h3>
-        <p className="text-sm font-medium text-slate-600 mb-3 line-clamp-1">
+        <p className="text-body-md font-medium text-secondary mb-3 line-clamp-1">
           {project.titleEn}
         </p>
 
-        <p className="text-sm text-csmju-text-body line-clamp-3 leading-[1.6] mb-4">
+        <p className="text-body-md text-on-surface-variant line-clamp-3 leading-[1.6] mb-4">
           {project.abstract}
         </p>
 
@@ -33,7 +34,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.techStack.map((tech) => (
             <span
               key={tech}
-              className="text-xs px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md font-mono"
+              className="text-label-sm px-2.5 py-0.5 bg-surface-container text-on-surface-variant rounded-md font-mono"
             >
               {tech}
             </span>
@@ -41,13 +42,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
-        <div className="text-xs text-slate-500">
+      <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-between mt-auto">
+        <div className="text-label-sm text-secondary">
           ผู้พัฒนา: {project.members[0]?.name || 'ไม่ระบุ'}
         </div>
         <Link
           href={`/showcase/${project.id}`}
-          className="text-sm font-semibold text-csmju-primary hover:underline focus:outline-none focus:ring-2 focus:ring-csmju-primary rounded-md px-1"
+          className="text-label-md font-semibold text-primary-container hover:underline focus:outline-none focus:ring-1 focus:ring-primary-container rounded-md px-1"
         >
           ดูรายละเอียด →
         </Link>
