@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import {
   AddIcon,
+  ArrowBackIcon,
   CheckIcon,
   CloseIcon,
   DashboardIcon,
@@ -19,7 +20,6 @@ import {
   TrendingUpIcon,
 } from './icons';
 import { UserContext } from '../types/domain';
-import { logoutAction } from '../actions/auth.actions';
 
 interface NavItem {
   href: string;
@@ -82,6 +82,9 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
   const ssoAuthorizeUrl =
     'http://localhost:3000/api/v1/auth/sso/authorize?subsystem=csmju-project-idea-hub&callback_url=http://localhost:3002/auth/callback';
 
+  const coreHubWebUrl =
+    process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL || process.env.CORE_HUB_WEB_URL || 'http://localhost:3000';
+
   return (
     <div className="flex min-h-dvh w-full bg-background text-on-surface">
       {/* Mobile drawer scrim */}
@@ -101,7 +104,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
           navOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="mb-6 px-4 pt-2">
+        <div className="mb-6 shrink-0 px-4 pt-2">
           {/* Logo container (framed white box matching Core Hub BackOffice standard) */}
           <div className="mb-4 flex items-center justify-between gap-2">
             <Link
@@ -137,6 +140,17 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
             </p>
           </div>
 
+          {/* Back to CSMJU Portal link (Standards 1.7.3 / ui-design-system 5.1) */}
+          {coreHubWebUrl && (
+            <a
+              href={coreHubWebUrl}
+              className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-label-md text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+            >
+              <ArrowBackIcon className="h-4 w-4 shrink-0" />
+              <span>กลับ CSMJU Portal</span>
+            </a>
+          )}
+
           {/* Primary Action Button */}
           <Link
             href="/showcase/new"
@@ -148,8 +162,8 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
           </Link>
         </div>
 
-        {/* Navigation items */}
-        <nav className="mt-1 flex-1 overflow-y-auto">
+        {/* Navigation items (scrolls independently so logout stays pinned) */}
+        <nav className="mt-1 min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <ul className="space-y-1">
             {NAV_ITEMS.map(({ href, label, labelEn, Icon }) => {
               const active =
@@ -178,8 +192,8 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
           </ul>
         </nav>
 
-        {/* User session / Logout in sidebar */}
-        <div className="mx-4 mt-auto pt-4 border-t border-white/10">
+        {/* User session / Logout in sidebar (pinned at bottom) */}
+        <div className="mx-4 mt-auto shrink-0 pt-4 border-t border-white/10">
           {user ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2.5 rounded-lg bg-white/10 p-2.5 backdrop-blur-sm">
@@ -196,7 +210,8 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
                 </div>
               </div>
 
-              <form action={logoutAction}>
+              {/* Sign out form via POST /auth/logout per Standards 1.7.2 */}
+              <form action="/auth/logout" method="post">
                 <button
                   type="submit"
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/25 bg-white/10 py-2 text-label-md text-white backdrop-blur-sm transition-colors hover:bg-white/20"
