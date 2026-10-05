@@ -19,6 +19,13 @@ describe('ProjectsService', () => {
       update: jest.Mock;
       delete: jest.Mock;
     };
+    projectFeedback: {
+      create: jest.Mock;
+      findMany: jest.Mock;
+    };
+    projectApproval: {
+      create: jest.Mock;
+    };
   };
 
   const mockUser: CoreHubIdentity = {
@@ -82,6 +89,13 @@ describe('ProjectsService', () => {
         create: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
+      },
+      projectFeedback: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+      },
+      projectApproval: {
+        create: jest.fn(),
       },
     };
 
@@ -251,6 +265,70 @@ describe('ProjectsService', () => {
       prisma.project.findUnique.mockResolvedValue(mockProject);
 
       await expect(service.remove(mockProject.id, otherUser)).rejects.toThrow(AppException);
+    });
+  });
+
+  describe('addFeedback', () => {
+    it('creates feedback for project', async () => {
+      prisma.project.findUnique.mockResolvedValue(mockProject);
+      prisma.projectFeedback.create.mockResolvedValue({
+        id: 'fb-1',
+        projectId: mockProject.id,
+        authorCoreUserId: mockUser.id,
+        comment: 'สุดยอด',
+        rating: 5,
+      });
+
+      const result = await service.addFeedback(
+        mockProject.id,
+        { comment: 'สุดยอด', rating: 5 },
+        mockUser,
+      );
+
+      expect(prisma.projectFeedback.create).toHaveBeenCalled();
+      expect(result.comment).toBe('สุดยอด');
+    });
+  });
+
+  describe('getFeedbacks', () => {
+    it('returns feedbacks for project', async () => {
+      prisma.project.findUnique.mockResolvedValue(mockProject);
+      prisma.projectFeedback.findMany.mockResolvedValue([
+        { id: 'fb-1', comment: 'สุดยอด' },
+      ]);
+
+      const result = await service.getFeedbacks(mockProject.id);
+
+      expect(prisma.projectFeedback.findMany).toHaveBeenCalledWith({
+        where: { projectId: mockProject.id },
+        orderBy: { createdAt: 'desc' },
+      });
+      expect(result.length).toBe(1);
+    });
+  });
+
+  describe('reviewProject', () => {
+    it('creates approval and updates status', async () => {
+      prisma.project.findUnique.mockResolvedValue(mockProject);
+      prisma.projectApproval.create.mockResolvedValue({ id: 'app-1' });
+      prisma.project.update.mockResolvedValue({
+        ...mockProject,
+        status: ProjectStatus.APPROVED,
+      });
+
+      const result = await service.reviewProject(
+        mockProject.id,
+        { action: 'APPROVED', comment: 'อนุมัติ' },
+        staffUser,
+      );
+
+      expect(prisma.projectApproval.create).toHaveBeenCalled();
+      expect(prisma.project.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { status: ProjectStatus.APPROVED },
+        }),
+      );
+      expect(result.status).toBe(ProjectStatus.APPROVED);
     });
   });
 });

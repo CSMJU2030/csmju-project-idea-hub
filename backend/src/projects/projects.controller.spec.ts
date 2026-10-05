@@ -59,6 +59,9 @@ describe('ProjectsController', () => {
       create: jest.fn().mockResolvedValue(mockProject),
       update: jest.fn().mockResolvedValue(mockProject),
       remove: jest.fn().mockResolvedValue({ id: mockProject.id, deleted: true }),
+      addFeedback: jest.fn().mockResolvedValue({ id: 'fb-1', comment: 'ยอดเยี่ยม' }),
+      getFeedbacks: jest.fn().mockResolvedValue([{ id: 'fb-1', comment: 'ยอดเยี่ยม' }]),
+      reviewProject: jest.fn().mockResolvedValue({ ...mockProject, status: 'APPROVED' }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -132,6 +135,35 @@ describe('ProjectsController', () => {
 
       expect(service.remove).toHaveBeenCalledWith(mockProject.id, mockUser);
       expect(result).toEqual({ id: mockProject.id, deleted: true });
+    });
+  });
+
+  describe('addFeedback', () => {
+    it('adds feedback to project', async () => {
+      const dto = { comment: 'ยอดเยี่ยม', rating: 5 };
+      const result = await controller.addFeedback(mockProject.id, dto, mockUser);
+
+      expect(service.addFeedback).toHaveBeenCalledWith(mockProject.id, dto, mockUser);
+      expect(result).toEqual({ id: 'fb-1', comment: 'ยอดเยี่ยม' });
+    });
+  });
+
+  describe('getFeedbacks', () => {
+    it('returns feedbacks for project', async () => {
+      const result = await controller.getFeedbacks(mockProject.id);
+
+      expect(service.getFeedbacks).toHaveBeenCalledWith(mockProject.id);
+      expect(result).toEqual([{ id: 'fb-1', comment: 'ยอดเยี่ยม' }]);
+    });
+  });
+
+  describe('reviewProject', () => {
+    it('submits review for project', async () => {
+      const dto = { action: 'APPROVED' as const, comment: 'ผ่านเกณฑ์' };
+      const result = await controller.reviewProject(mockProject.id, dto, mockUser);
+
+      expect(service.reviewProject).toHaveBeenCalledWith(mockProject.id, dto, mockUser);
+      expect(result.status).toBe('APPROVED');
     });
   });
 });

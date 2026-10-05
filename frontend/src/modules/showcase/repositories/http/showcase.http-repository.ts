@@ -281,23 +281,126 @@ export class ShowcaseHttpRepository implements IShowcaseRepository {
   }
 
   async addFeedback(feedback: Omit<ProjectFeedback, 'id' | 'createdAt'>): Promise<ProjectFeedback> {
-    return this.fallback.addFeedback(feedback);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/v1/projects/${feedback.projectId}/feedbacks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          comment: feedback.comment,
+          rating: feedback.rating,
+        }),
+      });
+      if (!res.ok) return this.fallback.addFeedback(feedback);
+      const json = await res.json();
+      if (!json.success || !json.data) return this.fallback.addFeedback(feedback);
+      return {
+        id: json.data.id,
+        projectId: json.data.projectId,
+        authorId: json.data.authorCoreUserId,
+        authorName: json.data.authorCoreUserId,
+        authorRole: json.data.authorRole,
+        comment: json.data.comment,
+        rating: json.data.rating ?? undefined,
+        createdAt: new Date(json.data.createdAt),
+      };
+    } catch {
+      return this.fallback.addFeedback(feedback);
+    }
   }
 
   async findFeedbackByProject(projectId: string): Promise<ProjectFeedback[]> {
-    return this.fallback.findFeedbackByProject(projectId);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/v1/projects/${projectId}/feedbacks`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+      });
+      if (!res.ok) return this.fallback.findFeedbackByProject(projectId);
+      const json = await res.json();
+      if (!json.success || !Array.isArray(json.data)) return this.fallback.findFeedbackByProject(projectId);
+      if (json.data.length === 0) return this.fallback.findFeedbackByProject(projectId);
+      return json.data.map((fb: any) => ({
+        id: fb.id,
+        projectId: fb.projectId,
+        authorId: fb.authorCoreUserId,
+        authorName: fb.authorCoreUserId,
+        authorRole: fb.authorRole,
+        comment: fb.comment,
+        rating: fb.rating ?? undefined,
+        createdAt: new Date(fb.createdAt),
+      }));
+    } catch {
+      return this.fallback.findFeedbackByProject(projectId);
+    }
   }
 
   async hasUserFeedback(projectId: string, authorId: string): Promise<boolean> {
-    return this.fallback.hasUserFeedback(projectId, authorId);
+    try {
+      const list = await this.findFeedbackByProject(projectId);
+      return list.some((fb) => fb.authorId === authorId);
+    } catch {
+      return this.fallback.hasUserFeedback(projectId, authorId);
+    }
   }
 
   async findIdeas(): Promise<ProjectIdea[]> {
-    return this.fallback.findIdeas();
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/v1/ideas`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+      });
+      if (!res.ok) return this.fallback.findIdeas();
+      const json = await res.json();
+      if (!json.success || !Array.isArray(json.data)) return this.fallback.findIdeas();
+      if (json.data.length === 0) return this.fallback.findIdeas();
+      return json.data.map((idea: any) => ({
+        id: idea.id,
+        title: idea.title,
+        description: idea.description,
+        proposedBy: {
+          coreUserId: idea.ownerCoreUserId,
+          name: idea.ownerCoreUserId,
+          role: 'STUDENT',
+        },
+        tags: [],
+        status: idea.status === 'OPEN' ? 'OPEN' : 'IN_DISCUSSION',
+        createdAt: new Date(idea.createdAt),
+      }));
+    } catch {
+      return this.fallback.findIdeas();
+    }
   }
 
   async createIdea(idea: Omit<ProjectIdea, 'id' | 'createdAt'>): Promise<ProjectIdea> {
-    return this.fallback.createIdea(idea);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/v1/ideas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          title: idea.title,
+          description: idea.description,
+        }),
+      });
+      if (!res.ok) return this.fallback.createIdea(idea);
+      const json = await res.json();
+      if (!json.success || !json.data) return this.fallback.createIdea(idea);
+      return {
+        id: json.data.id,
+        title: json.data.title,
+        description: json.data.description,
+        proposedBy: idea.proposedBy,
+        tags: idea.tags,
+        status: idea.status,
+        createdAt: new Date(json.data.createdAt),
+      };
+    } catch {
+      return this.fallback.createIdea(idea);
+    }
   }
 }
 

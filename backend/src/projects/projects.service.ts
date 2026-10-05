@@ -4,8 +4,10 @@ import { CoreHubIdentity, SubsystemRole } from '../auth/core-hub-identity';
 import { buildPaginationMeta } from '../common/dto/pagination.dto';
 import { AppException } from '../common/errors';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectQueryDto } from './dto/project-query.dto';
+import { ReviewProjectDto } from './dto/review-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
@@ -184,5 +186,60 @@ export class ProjectsService {
     });
 
     return { id, deleted: true };
+  }
+
+  async addFeedback(projectId: string, dto: CreateFeedbackDto, user: CoreHubIdentity) {
+    await this.findById(projectId);
+
+    const feedback = await this.prisma.projectFeedback.create({
+      data: {
+        projectId,
+        authorCoreUserId: user.id,
+        authorRole: user.subsystemRole,
+        comment: dto.comment,
+        rating: dto.rating,
+      },
+    });
+
+    return feedback;
+  }
+
+  async getFeedbacks(projectId: string) {
+    await this.findById(projectId);
+
+    return this.prisma.projectFeedback.findMany({
+      where: { projectId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async reviewProject(projectId: string, dto: ReviewProjectDto, user: CoreHubIdentity) {
+    await this.findById(projectId);
+
+    await this.prisma.projectApproval.create({
+      data: {
+        projectId,
+        reviewerCoreUserId: user.id,
+        action: dto.action,
+        comment: dto.comment,
+      },
+    });
+
+    const newStatus =
+      dto.action === 'APPROVED' ? ProjectStatus.APPROVED : ProjectStatus.REQUESTED_CHANGES;
+
+    const updated = await this.prisma.project.update({
+      where: { id: projectId },
+      data: {
+        status: newStatus,
+      },
+      include: {
+        members: true,
+        tags: true,
+        approvals: true,
+      },
+    });
+
+    return updated;
   }
 }

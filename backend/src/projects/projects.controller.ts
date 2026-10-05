@@ -14,8 +14,10 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequirePermissions } from '../auth/decorators/require-permissions.decorator';
 import { Permission } from '../auth/permissions';
 import { CollectionResult } from '../common/api-response';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectQueryDto } from './dto/project-query.dto';
+import { ReviewProjectDto } from './dto/review-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
 
@@ -62,5 +64,31 @@ export class ProjectsController {
     @CurrentUser() user: CoreHubIdentity,
   ) {
     return this.projectsService.remove(id, user);
+  }
+
+  @Post(':id/feedbacks')
+  @RequirePermissions(Permission.FEEDBACK_CREATE)
+  async addFeedback(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: CreateFeedbackDto,
+    @CurrentUser() user: CoreHubIdentity,
+  ) {
+    return this.projectsService.addFeedback(id, dto, user);
+  }
+
+  @Get(':id/feedbacks')
+  @RequirePermissions(Permission.FEEDBACK_READ)
+  async getFeedbacks(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.projectsService.getFeedbacks(id);
+  }
+
+  @Post(':id/reviews')
+  @RequirePermissions(Permission.PROJECT_REVIEW)
+  async reviewProject(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: ReviewProjectDto,
+    @CurrentUser() user: CoreHubIdentity,
+  ) {
+    return this.projectsService.reviewProject(id, dto, user);
   }
 }
