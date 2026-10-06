@@ -7,10 +7,10 @@ import { SubsystemRole } from './core-hub-identity';
  *   ---------------------------------
  *   student            STUDENT
  *   alumni             ALUMNI
- *   staff              STAFF    (staff who are not lecturers)
- *   lecturer           STAFF    (standards 1.0.6 / 1.6.0)
- *   guest              ALUMNI   (looks at rooms only)
+ *   staff              STAFF    (read-only)
+ *   lecturer           ADVISOR  (advisor can review projects)
  *   admin              ADMIN
+ *   guest              (rejected -> 403 Forbidden)
  *
  * The mapping is explicit and lives only in this subsystem. The Core Hub role
  * vocabulary can change without changing subsystem authorization logic - only
@@ -22,7 +22,6 @@ export const CORE_ROLE_TO_SUBSYSTEM_ROLE: Readonly<Record<string, SubsystemRole>
   staff: SubsystemRole.STAFF,
   lecturer: SubsystemRole.ADVISOR,
   admin: SubsystemRole.ADMIN,
-  superadmin: SubsystemRole.ADMIN,
 });
 
 /**

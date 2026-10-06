@@ -79,8 +79,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
     return name.slice(0, 2).toUpperCase();
   };
 
-  const ssoAuthorizeUrl =
-    'http://localhost:3000/api/v1/auth/sso/authorize?subsystem=csmju-project-idea-hub&callback_url=http://localhost:3002/auth/callback';
+  const loginUrl = `/auth/login?next=${encodeURIComponent(pathname || '/showcase')}`;
 
   const coreHubWebUrl =
     process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL || process.env.CORE_HUB_WEB_URL || 'http://localhost:3000';
@@ -223,7 +222,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
             </div>
           ) : (
             <a
-              href={ssoAuthorizeUrl}
+              href={loginUrl}
               className="btn-gradient flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-label-md text-white shadow-md"
             >
               <span>เข้าสู่ระบบ Core Hub</span>
@@ -299,7 +298,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
               </div>
             ) : (
               <a
-                href={ssoAuthorizeUrl}
+                href={loginUrl}
                 className="btn-gradient hidden items-center justify-center rounded-lg px-4 py-2 text-label-md text-white shadow-sm md:inline-flex"
               >
                 เข้าสู่ระบบ SSO
