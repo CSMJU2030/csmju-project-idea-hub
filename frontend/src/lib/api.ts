@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:4201';
+const BACKEND_URL = process.env.BACKEND_URL ?? 'http://127.0.0.1:4223';
 const SUBSYSTEM_ID = process.env.SUBSYSTEM_ID ?? 'csmju-project-idea-hub';
 
 /**
