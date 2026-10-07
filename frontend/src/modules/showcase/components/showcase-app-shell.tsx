@@ -82,7 +82,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
   const loginUrl = `/auth/login?next=${encodeURIComponent(pathname || '/showcase')}`;
 
   const coreHubWebUrl =
-    process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL || process.env.CORE_HUB_WEB_URL || 'http://localhost:3000';
+    process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL || process.env.CORE_HUB_WEB_URL || '';
 
   return (
     <div className="flex min-h-dvh w-full bg-background text-on-surface">
