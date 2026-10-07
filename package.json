@@ -1,5 +1,20 @@
 {
   "name": "csmju-project-idea-hub",
+  "version": "1.0.0",
   "private": true,
+  "description": "CS Project and Idea Hub - CSMJU2030 subsystem",
+  "scripts": {
+    "dev": "pnpm --parallel --filter backend --filter frontend start:dev",
+    "build": "pnpm -r build",
+    "start:dev": "pnpm --filter backend start:dev",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "prisma:generate": "pnpm --filter backend prisma:generate",
+    "prisma:migrate": "pnpm --filter backend prisma:migrate",
+    "prisma:seed": "pnpm --filter backend prisma:seed",
+    "conformance": "node standards/conformance/run.js",
+    "checks": "./standards/scripts/run-all-checks.sh ."
+  },
   "packageManager": "pnpm@9.15.9"
 }

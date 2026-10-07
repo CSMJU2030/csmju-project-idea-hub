@@ -1,0 +1,144 @@
+// CSMJU CS Project & Idea Hub - OWN database schema.
+//
+// Naming follows the CSMJU2030 Subsystem Standard: PostgreSQL tables are plural
+// snake_case and every column is snake_case through @map, while Prisma/TypeScript
+// field names stay camelCase. Application code is therefore unchanged.
+//
+// This database belongs to the subsystem only. It never contains Core Hub
+// users, passwords, sessions or key material. `coreUserId` is an EXTERNAL
+// identity reference to a Core Hub user id (`sub`) - nothing more.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  DRAFT
+  PROPOSED
+  APPROVED
+  REQUESTED_CHANGES
+  COMPLETED
+  ARCHIVED
+}
+
+enum IdeaStatus {
+  OPEN
+  EXPLORING
+  IN_PROGRESS
+  CLOSED
+}
+
+model Project {
+  id                String        @id @default(uuid())
+  titleTh           String        @map("title_th")
+  titleEn           String        @map("title_en")
+  abstract          String
+  category          String
+  status            ProjectStatus @default(PROPOSED)
+  ownerCoreUserId   String        @map("owner_core_user_id")
+  advisorCoreUserId String?       @map("advisor_core_user_id")
+  academicYear      Int           @map("academic_year")
+  semester          Int           @default(1)
+  githubUrl         String?       @map("github_url")
+  demoUrl           String?       @map("demo_url")
+  proposalUrl       String?       @map("proposal_url")
+  progressReportUrl String?       @map("progress_report_url")
+  fullThesisPdfUrl  String?       @map("full_thesis_pdf_url")
+  posterImageUrl    String?       @map("poster_image_url")
+  demoVideoUrl      String?       @map("demo_video_url")
+  chapter1Summary   String?       @map("chapter1_summary")
+  chapter2Summary   String?       @map("chapter2_summary")
+  chapter3Summary   String?       @map("chapter3_summary")
+  chapter4Summary   String?       @map("chapter4_summary")
+  chapter5Summary   String?       @map("chapter5_summary")
+
+  members   ProjectMember[]
+  tags      ProjectTag[]
+  feedbacks ProjectFeedback[]
+  approvals ProjectApproval[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerCoreUserId])
+  @@index([advisorCoreUserId])
+  @@index([status])
+  @@index([category])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id            String   @id @default(uuid())
+  projectId     String   @map("project_id")
+  coreUserId    String   @map("core_user_id")
+  roleInProject String   @default("MEMBER") @map("role_in_project")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([coreUserId])
+  @@map("project_members")
+}
+
+model ProjectTag {
+  id        String @id @default(uuid())
+  projectId String @map("project_id")
+  tagName   String @map("tag_name")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_tags")
+}
+
+model Idea {
+  id              String     @id @default(uuid())
+  title           String
+  description     String
+  ownerCoreUserId String     @map("owner_core_user_id")
+  votesCount      Int        @default(0) @map("votes_count")
+  status          IdeaStatus @default(OPEN)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerCoreUserId])
+  @@index([status])
+  @@map("ideas")
+}
+
+model ProjectFeedback {
+  id               String   @id @default(uuid())
+  projectId        String   @map("project_id")
+  authorCoreUserId String   @map("author_core_user_id")
+  authorRole       String   @map("author_role")
+  comment          String
+  rating           Int?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_feedbacks")
+}
+
+model ProjectApproval {
+  id                 String   @id @default(uuid())
+  projectId          String   @map("project_id")
+  reviewerCoreUserId String   @map("reviewer_core_user_id")
+  action             String
+  comment            String?
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_approvals")
+}
