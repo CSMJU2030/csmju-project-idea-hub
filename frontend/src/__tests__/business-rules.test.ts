@@ -4,6 +4,7 @@ import { validateProjectInput } from '../modules/showcase/utils/validation';
 import { canEditProject, canReviewProject, canDeleteProject } from '../modules/showcase/auth/permissions';
 import { checkDuplicateTitle, calculateSimilarity } from '../modules/showcase/utils/anti-duplicate';
 import { Project, UserContext } from '../modules/showcase/types/domain';
+import { ROLE_LABELS } from '../modules/showcase/components/showcase-app-shell';
 
 // ข้อมูลจำลองสำหรับทดสอบ
 const mockProject: Project = {
@@ -209,5 +210,15 @@ describe('3. Anti-Duplicate Title Check', () => {
     const result = checkDuplicateTitle('ระบบบริหารจัดการแปลงปลูกข้าวอัจฉริยะ', [mockProject]);
     assert.equal(result.isDuplicate, false);
     assert.ok(result.score < 50);
+  });
+});
+
+describe('4. Role Mapping and Labels', () => {
+  it('มีป้ายกำกับบทบาทภาษาไทยครบถ้วนรวมถึงเจ้าหน้าที่ (STAFF)', () => {
+    assert.equal(ROLE_LABELS.ADMIN, 'ผู้ดูแลระบบ');
+    assert.equal(ROLE_LABELS.TEACHER, 'อาจารย์ที่ปรึกษา');
+    assert.equal(ROLE_LABELS.STUDENT, 'นักศึกษา');
+    assert.equal(ROLE_LABELS.ALUMNI, 'ศิษย์เก่า');
+    assert.equal(ROLE_LABELS.STAFF, 'เจ้าหน้าที่');
   });
 });

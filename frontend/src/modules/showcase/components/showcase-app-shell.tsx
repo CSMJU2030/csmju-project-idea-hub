@@ -44,11 +44,12 @@ const FOOTER_LINKS = [
   'ปฏิทินการศึกษา',
 ];
 
-const ROLE_LABELS: Record<string, string> = {
+export const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'ผู้ดูแลระบบ',
   TEACHER: 'อาจารย์ที่ปรึกษา',
   STUDENT: 'นักศึกษา',
   ALUMNI: 'ศิษย์เก่า',
+  STAFF: 'เจ้าหน้าที่',
 };
 
 interface ShowcaseAppShellProps {

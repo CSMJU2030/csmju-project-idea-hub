@@ -18,6 +18,7 @@ import { ProjectsModule } from './projects/projects.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env.local', '../.env.local', '.env'],
       load: [configuration],
       validate: validateEnv,
     }),

@@ -2,7 +2,7 @@ import { IShowcaseRepository } from '../showcase.repository.interface';
 import { Project, ProjectFeedback, ProjectIdea, ProjectStatus } from '../../types/domain';
 import { ShowcaseMockRepository } from '../mock/showcase.mock-repository';
 
-const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4201';
+const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4223';
 
 interface BackendProject {
   id: string;

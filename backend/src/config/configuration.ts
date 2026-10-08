@@ -35,7 +35,7 @@ export default (): AppConfig => {
 
   return {
     nodeEnv: process.env.NODE_ENV ?? 'development',
-    port: num(process.env.PORT, 3002),
+    port: num(process.env.PORT, 4223),
     subsystemId: process.env.SUBSYSTEM_ID ?? 'csmju-project-idea-hub',
     subsystemName: process.env.SUBSYSTEM_NAME ?? 'CS Project and Idea Hub',
     coreHub: {
