@@ -192,11 +192,11 @@ export async function getDashboardStatsAction(): Promise<ActionResponse<Dashboar
   try {
     const user = await getCurrentUser();
     
-    // ตรวจสอบสิทธิ์ Server: อนุญาตเฉพาะ ADMIN เท่านั้น
-    if (!user || user.role !== 'ADMIN') {
+    // ตรวจสอบสิทธิ์ Server: อนุญาตเฉพาะ ADMIN และ STAFF เท่านั้น
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
       return {
         success: false,
-        message: 'คุณไม่มีสิทธิ์เข้าถึงแดชบอร์ดสถิติ (สำหรับผู้ดูแลระบบเท่านั้น)',
+        message: 'คุณไม่มีสิทธิ์เข้าถึงแดชบอร์ดสถิติ (สำหรับผู้ดูแลระบบและเจ้าหน้าที่เท่านั้น)',
       };
     }
 

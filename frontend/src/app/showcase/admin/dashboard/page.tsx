@@ -1,13 +1,15 @@
 import Link from 'next/link';
+import { getCurrentUser } from '../../../../lib/auth';
 import { getDashboardStatsAction } from '../../../../modules/showcase/actions/project.actions';
 import { StatChartCard } from '../../../../modules/showcase/components/stat-chart-card';
 import { cardClass } from '../../../../modules/showcase/components/ui';
 import { ArrowBackIcon, CloseIcon } from '../../../../modules/showcase/components/icons';
 
 export default async function AdminDashboardPage() {
+  const user = await getCurrentUser();
   const res = await getDashboardStatsAction();
 
-  // กรณีไม่มีสิทธิ์เข้าถึง (ไม่ได้เป็น ADMIN)
+  // กรณีไม่มีสิทธิ์เข้าถึง (ไม่ได้เป็น ADMIN หรือ STAFF)
   if (!res.success || !res.data) {
     return (
       <div className="py-12 px-4 text-center text-on-surface fade-slide-up">
@@ -19,7 +21,7 @@ export default async function AdminDashboardPage() {
           </div>
           <h1 className="font-display text-headline-md font-bold text-error">ไม่มีสิทธิ์เข้าถึงแดชบอร์ด</h1>
           <p className="text-body-md text-on-surface-variant leading-[1.6]">
-            {res.message || 'หน้านี้สงวนไว้สำหรับผู้ดูแลระบบ (ADMIN) เท่านั้น'}
+            {res.message || 'หน้านี้สงวนไว้สำหรับผู้ดูแลระบบและเจ้าหน้าที่เท่านั้น'}
           </p>
           <Link
             href="/showcase"
@@ -52,7 +54,7 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
           <span className="self-start sm:self-center text-label-sm font-semibold px-3 py-1.5 bg-primary-container/10 text-primary-container border border-primary-container/20 rounded-full">
-            สิทธิ์ผู้ดูแลระบบ (Admin)
+            {user?.role === 'STAFF' ? 'สิทธิ์เจ้าหน้าที่ (Staff)' : 'สิทธิ์ผู้ดูแลระบบ (Admin)'}
           </span>
         </div>
       </div>
