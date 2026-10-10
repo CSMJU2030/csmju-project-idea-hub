@@ -8,6 +8,8 @@ import { DuplicateCheckResult } from '../utils/anti-duplicate';
 import { cardClass, primaryButtonClass, secondaryButtonClass, inputClass } from './ui';
 import { CheckIcon, CloseIcon } from './icons';
 
+import { UserContext } from '../types/domain';
+
 interface FormState {
   titleTh: string;
   titleEn: string;
@@ -44,7 +46,18 @@ const CATEGORIES = [
   'Cybersecurity & Network',
 ];
 
-export function ProjectForm() {
+const ADVISOR_PRESETS = [
+  { id: 'adv-001', name: 'ผศ.ดร. ที่ปรึกษา ใจดี' },
+  { id: 'adv-002', name: 'รศ.ดร. นวัตกรรม ก้าวหน้า' },
+  { id: 'adv-003', name: 'อ.ดร. เทคโนโลยี อัจฉริยะ' },
+  { id: 'lecturer', name: 'อาจารย์ผู้ทดสอบระบบ (Lecturer Test)' },
+];
+
+interface ProjectFormProps {
+  user?: UserContext | null;
+}
+
+export function ProjectForm({ user }: ProjectFormProps = {}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -68,8 +81,8 @@ export function ProjectForm() {
     chapter3: '',
     chapter4: '',
     chapter5: '',
-    memberId: 'user-std-001',
-    memberName: 'สมชาย นักศึกษา',
+    memberId: user?.id || 'user-std-001',
+    memberName: user?.name || 'สมชาย นักศึกษา',
     advisorId: 'adv-001',
     advisorName: 'ผศ.ดร. ที่ปรึกษา ใจดี',
   });
@@ -541,11 +554,26 @@ export function ProjectForm() {
             <input
               id="advisorName"
               type="text"
+              list="advisor-list"
               required
               value={form.advisorName}
-              onChange={(e) => setForm({ ...form, advisorName: e.target.value })}
+              onChange={(e) => {
+                const val = e.target.value;
+                const match = ADVISOR_PRESETS.find((a) => a.name === val);
+                setForm({
+                  ...form,
+                  advisorName: val,
+                  advisorId: match ? match.id : form.advisorId || 'adv-001',
+                });
+              }}
+              placeholder="เลือกหรือพิมพ์ชื่ออาจารย์ที่ปรึกษา..."
               className="w-full p-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-csmju-primary"
             />
+            <datalist id="advisor-list">
+              {ADVISOR_PRESETS.map((adv) => (
+                <option key={adv.id} value={adv.name} />
+              ))}
+            </datalist>
             {fieldErrors.advisors && (
               <p className="text-xs text-red-600 mt-1">{fieldErrors.advisors[0]}</p>
             )}

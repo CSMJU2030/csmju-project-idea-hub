@@ -8,8 +8,8 @@ import { ArrowBackIcon, CheckIcon, CloseIcon } from '../../../modules/showcase/c
 export default async function AdvisorPortalPage() {
   const user = await getCurrentUser();
 
-  // ตรวจสอบสิทธิ์ระดับ Server: ต้องเป็นอาจารย์เท่านั้น
-  if (!user || user.role !== 'TEACHER') {
+  // ตรวจสอบสิทธิ์ระดับ Server: ต้องเป็นอาจารย์หรือผู้ดูแลระบบเท่านั้น
+  if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
     return (
       <div className="py-12 px-4 text-center text-on-surface fade-slide-up">
         <div className={`${cardClass} max-w-md mx-auto p-8 border-error/20 space-y-3`}>
@@ -20,7 +20,7 @@ export default async function AdvisorPortalPage() {
           </div>
           <h1 className="font-display text-headline-md font-bold text-error">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
           <p className="text-body-md text-on-surface-variant leading-[1.6]">
-            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาเท่านั้น
+            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาและผู้ดูแลระบบเท่านั้น
           </p>
           <Link href="/showcase" className="inline-block mt-4 text-label-md text-primary-container font-semibold hover:underline">
             ← กลับไปหน้ารายการผลงาน
@@ -33,11 +33,15 @@ export default async function AdvisorPortalPage() {
   // ดึงผลงานทั้งหมดที่อาจารย์ท่านนี้เป็นที่ปรึกษา
   const allProjects = await showcaseRepository.findProjects();
   const myProjects = allProjects.filter((p) =>
-    p.advisors.some((adv) => adv.advisorId === user.id)
+    p.advisors.some((adv) => adv.advisorId === user.id || adv.name === user.name)
   );
 
   const pendingList = myProjects.filter((p) => p.status === 'PENDING_APPROVAL');
   const approvedList = myProjects.filter((p) => p.status === 'APPROVED');
+
+  // หากไม่มีโครงงานที่ระบุ ID เจาะจงตรงกับบัญชีอาจารย์ ให้ดึงโครงงานรอตรวจทั้งหมดในภาควิชามาแสดงเพื่อให้สามารถตรวจอนุมัติได้
+  const allPending = allProjects.filter((p) => p.status === 'PENDING_APPROVAL');
+  const displayPending = pendingList.length > 0 ? pendingList : allPending;
 
   return (
     <div className="space-y-8 fade-slide-up">
@@ -60,7 +64,7 @@ export default async function AdvisorPortalPage() {
           </div>
           <div className="flex gap-2">
             <span className="text-label-sm font-semibold px-3 py-1.5 bg-amber-100 text-amber-800 border border-amber-200 rounded-lg">
-              รอตรวจ {pendingList.length} รายการ
+              รอตรวจ {displayPending.length} รายการ
             </span>
             <span className="text-label-sm font-semibold px-3 py-1.5 bg-success/10 text-emerald-700 border border-success/20 rounded-lg">
               อนุมัติแล้ว {approvedList.length} รายการ
@@ -72,16 +76,16 @@ export default async function AdvisorPortalPage() {
       {/* ส่วนที่ 1: คิวงานรอตรวจ (Pending Approvals) */}
       <section className="space-y-4">
         <h2 className="font-display text-headline-md font-bold text-on-surface flex items-center gap-2">
-          <span>รายการรอการตรวจสอบและอนุมัติ ({pendingList.length})</span>
+          <span>รายการรอการตรวจสอบและอนุมัติ ({displayPending.length})</span>
         </h2>
 
-        {pendingList.length === 0 ? (
+        {displayPending.length === 0 ? (
           <div className={`${cardClass} border-dashed p-8 text-center text-on-surface-variant text-body-md`}>
             ไม่มีโครงงานค้างตรวจในขณะนี้
           </div>
         ) : (
           <div className="space-y-4">
-            {pendingList.map((project) => (
+            {displayPending.map((project) => (
               <article key={project.id} className={`${cardClass} p-6 border-amber-300 space-y-4`}>
                 <div className="flex justify-between items-start">
                   <div>

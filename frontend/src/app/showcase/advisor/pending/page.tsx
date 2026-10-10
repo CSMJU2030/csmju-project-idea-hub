@@ -8,8 +8,8 @@ import { ArrowBackIcon, CloseIcon, DescriptionIcon } from '../../../../modules/s
 export default async function AdvisorPendingPage() {
   const user = await getCurrentUser();
 
-  // ตรวจสอบสิทธิ์ระดับ Server: ต้องเป็นอาจารย์เท่านั้น
-  if (!user || user.role !== 'TEACHER') {
+  // ตรวจสอบสิทธิ์ระดับ Server: ต้องเป็นอาจารย์หรือผู้ดูแลระบบเท่านั้น
+  if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
     return (
       <div className="py-12 px-4 text-center text-on-surface fade-slide-up">
         <div className={`${cardClass} max-w-md mx-auto p-8 border-error/20 space-y-3`}>
@@ -20,7 +20,7 @@ export default async function AdvisorPendingPage() {
           </div>
           <h1 className="font-display text-headline-md font-bold text-error">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
           <p className="text-body-md text-on-surface-variant leading-[1.6]">
-            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาเท่านั้น
+            หน้านี้สงวนไว้สำหรับอาจารย์ที่ปรึกษาและผู้ดูแลระบบเท่านั้น
           </p>
           <Link
             href="/showcase"
@@ -33,14 +33,15 @@ export default async function AdvisorPendingPage() {
     );
   }
 
-  // ดึงโครงงานที่สถานะ PENDING_APPROVAL และอาจารย์ท่านนี้มีชื่อเป็นที่ปรึกษา
+  // ดึงโครงงานที่สถานะ PENDING_APPROVAL
   const pendingProjects = await showcaseRepository.findProjects({
     status: 'PENDING_APPROVAL',
   });
 
   const myAssignedProjects = pendingProjects.filter((project) =>
-    project.advisors.some((adv) => adv.advisorId === user.id)
+    project.advisors.some((adv) => adv.advisorId === user.id || adv.name === user.name)
   );
+  const displayProjects = myAssignedProjects.length > 0 ? myAssignedProjects : pendingProjects;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 fade-slide-up">
@@ -62,12 +63,12 @@ export default async function AdvisorPendingPage() {
             </p>
           </div>
           <span className="self-start sm:self-center text-label-sm font-semibold px-3 py-1.5 bg-amber-100 text-amber-800 border border-amber-200 rounded-full">
-            รอตรวจ {myAssignedProjects.length} รายการ
+            รอตรวจ {displayProjects.length} รายการ
           </span>
         </div>
       </div>
 
-      {myAssignedProjects.length === 0 ? (
+      {displayProjects.length === 0 ? (
         <section
           aria-label="ไม่มีงานค้าง"
           className={`${cardClass} border-dashed p-12 text-center`}
@@ -84,7 +85,7 @@ export default async function AdvisorPendingPage() {
         </section>
       ) : (
         <div className="space-y-6">
-          {myAssignedProjects.map((project) => (
+          {displayProjects.map((project) => (
             <article
               key={project.id}
               className={`${cardClass} p-6 sm:p-8 space-y-4`}

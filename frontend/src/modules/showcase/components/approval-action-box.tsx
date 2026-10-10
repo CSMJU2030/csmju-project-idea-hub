@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { reviewProjectAction } from '../actions/approval.actions';
 import { cardClass, dangerButtonClass, inputClass, primaryButtonClass, secondaryButtonClass } from './ui';
 import { CheckIcon, CloseIcon } from './icons';
@@ -11,6 +12,7 @@ interface ApprovalActionBoxProps {
 }
 
 export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -25,6 +27,7 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
       } else {
         setFeedbackMessage({ text: res.message, isError: false });
         if (onSuccess) onSuccess();
+        router.refresh();
       }
     });
   };
@@ -47,6 +50,7 @@ export function ApprovalActionBox({ projectId, onSuccess }: ApprovalActionBoxPro
         setShowRejectForm(false);
         setRejectionReason('');
         if (onSuccess) onSuccess();
+        router.refresh();
       }
     });
   };
