@@ -26,15 +26,16 @@ interface NavItem {
   label: string;
   labelEn: string;
   Icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
 }
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/showcase', label: 'ผลงานและโครงงาน', labelEn: 'Projects', Icon: MenuBookIcon },
   { href: '/showcase/ideas', label: 'คลังไอเดีย', labelEn: 'Idea Bank', Icon: DashboardIcon },
-  { href: '/showcase/approvals', label: 'ตรวจสอบผลงาน', labelEn: 'Approvals', Icon: CheckIcon },
-  { href: '/showcase/advisor', label: 'อาจารย์ที่ปรึกษา', labelEn: 'Advisors', Icon: SchoolIcon },
+  { href: '/showcase/approvals', label: 'ตรวจสอบผลงาน', labelEn: 'Approvals', Icon: CheckIcon, roles: ['TEACHER', 'ADMIN'] },
+  { href: '/showcase/advisor', label: 'อาจารย์ที่ปรึกษา', labelEn: 'Advisors', Icon: SchoolIcon, roles: ['TEACHER', 'ADMIN'] },
   { href: '/showcase/alumni', label: 'ทำเนียบศิษย์เก่า', labelEn: 'Alumni', Icon: GroupIcon },
-  { href: '/showcase/admin/dashboard', label: 'สถิติและรายงาน', labelEn: 'Analytics', Icon: TrendingUpIcon },
+  { href: '/showcase/admin/dashboard', label: 'สถิติและรายงาน', labelEn: 'Analytics', Icon: TrendingUpIcon, roles: ['ADMIN', 'STAFF'] },
 ];
 
 const FOOTER_LINKS = [
@@ -83,7 +84,9 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
   const loginUrl = `/auth/login?next=${encodeURIComponent(pathname || '/showcase')}`;
 
   const coreHubWebUrl =
-    process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL || process.env.CORE_HUB_WEB_URL || '';
+    process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL ||
+    process.env.CORE_HUB_WEB_URL ||
+    'https://csmju2030.jowave.com';
 
   return (
     <div className="flex min-h-dvh w-full bg-background text-on-surface">
@@ -105,22 +108,38 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
         }`}
       >
         <div className="mb-6 shrink-0 px-4 pt-2">
-          {/* Logo container (framed white box matching Core Hub BackOffice standard) */}
-          <div className="mb-4 flex items-center justify-between gap-2">
+          {/* Logo container and title (framed white box matching Core Hub BackOffice standard) */}
+          <div className="mb-4 flex items-start justify-between gap-2">
             <Link
               href="/showcase"
-              onClick={closeNav}
-              className="flex w-full flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-transform hover:scale-[1.01]"
+              onClick={() => {
+                setSearchTerm('');
+                closeNav();
+              }}
+              title="กลับไปหน้าหลัก (CSMJU Showcase)"
+              className="group flex flex-1 flex-col items-center rounded-xl p-1 transition-all focus:outline-none focus:ring-2 focus:ring-white/40"
             >
-              <Image
-                src="/csmju-logo.png"
-                alt="โลโก้ สาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้"
-                width={200}
-                height={140}
-                priority
-                className="h-auto w-full max-w-[120px] object-contain"
-              />
+              <div className="flex w-full flex-col items-center justify-center rounded-xl bg-white p-3 shadow-sm transition-transform duration-200 group-hover:scale-[1.02] group-hover:shadow-md">
+                <Image
+                  src="/csmju-logo.png"
+                  alt="โลโก้ สาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้"
+                  width={200}
+                  height={140}
+                  priority
+                  className="h-auto w-full max-w-[120px] object-contain"
+                />
+              </div>
+
+              <div className="mt-3 text-center">
+                <h2 className="font-display text-label-md font-bold text-white transition-colors duration-200 group-hover:text-primary-fixed">
+                  CSMJU Showcase
+                </h2>
+                <p className="text-caption text-primary-fixed">
+                  คลังผลงานและวิทยานิพนธ์
+                </p>
+              </div>
             </Link>
+
             <button
               type="button"
               onClick={closeNav}
@@ -131,25 +150,14 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
             </button>
           </div>
 
-          <div className="mb-4 text-center">
-            <h2 className="font-display text-label-md font-bold text-white">
-              CSMJU Showcase
-            </h2>
-            <p className="text-caption text-primary-fixed">
-              คลังผลงานและวิทยานิพนธ์
-            </p>
-          </div>
-
           {/* Back to CSMJU Portal link (Standards 1.7.3 / ui-design-system 5.1) */}
-          {coreHubWebUrl && (
-            <a
-              href={coreHubWebUrl}
-              className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-label-md text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-            >
-              <ArrowBackIcon className="h-4 w-4 shrink-0" />
-              <span>กลับ CSMJU Portal</span>
-            </a>
-          )}
+          <a
+            href={coreHubWebUrl}
+            className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-label-md text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            <ArrowBackIcon className="h-4 w-4 shrink-0" />
+            <span>กลับ CSMJU Portal</span>
+          </a>
 
           {/* Primary Action Button */}
           <Link
@@ -165,7 +173,11 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
         {/* Navigation items (scrolls independently so logout stays pinned) */}
         <nav className="mt-1 min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <ul className="space-y-1">
-            {NAV_ITEMS.map(({ href, label, labelEn, Icon }) => {
+            {NAV_ITEMS.filter((item) => {
+              if (!item.roles) return true;
+              if (!user) return false;
+              return item.roles.includes(user.role);
+            }).map(({ href, label, labelEn, Icon }) => {
               const active =
                 href === '/showcase'
                   ? pathname === href
@@ -236,7 +248,7 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
       <div className="ml-0 flex min-h-dvh flex-1 flex-col md:ml-64">
         {/* Sticky Topbar */}
         <header className="sticky top-0 z-10 flex h-16 w-full items-center justify-between gap-4 border-b border-surface-variant bg-surface-container-lowest px-4 shadow-sm md:px-12">
-          {/* Mobile menu button and brand name */}
+          {/* Mobile menu button, Back button and brand name */}
           <div className="flex items-center gap-2 md:hidden">
             <button
               type="button"
@@ -246,9 +258,45 @@ export function ShowcaseAppShell({ user, children }: ShowcaseAppShellProps) {
             >
               <MenuIcon className="h-6 w-6" />
             </button>
-            <Link href="/showcase" className="text-gradient font-display text-headline-md font-bold">
+            {pathname !== '/showcase' && (
+              <button
+                type="button"
+                onClick={() => router.back()}
+                aria-label="ย้อนกลับ"
+                className="rounded-lg p-2 text-on-surface transition-colors hover:bg-surface-variant/50"
+              >
+                <ArrowBackIcon className="h-5 w-5" />
+              </button>
+            )}
+            <Link
+              href="/showcase"
+              onClick={() => setSearchTerm('')}
+              className="text-gradient font-display text-headline-md font-bold"
+            >
               CSMJU Showcase
             </Link>
+          </div>
+
+          {/* Desktop Left: Back button if on subpage, or Portal link */}
+          <div className="hidden items-center gap-3 md:flex">
+            {pathname !== '/showcase' ? (
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="inline-flex items-center gap-2 rounded-lg border border-outline-variant/60 bg-surface px-3 py-1.5 text-label-md font-medium text-on-surface shadow-xs transition-colors hover:border-primary-container hover:bg-surface-variant/40 hover:text-primary-container"
+              >
+                <ArrowBackIcon className="h-4 w-4" />
+                <span>ย้อนกลับ</span>
+              </button>
+            ) : (
+              <a
+                href={coreHubWebUrl}
+                className="inline-flex items-center gap-2 rounded-lg border border-outline-variant/60 bg-surface px-3 py-1.5 text-label-md font-medium text-secondary shadow-xs transition-colors hover:border-primary-container hover:bg-surface-variant/40 hover:text-primary-container"
+              >
+                <ArrowBackIcon className="h-4 w-4" />
+                <span>กลับ CSMJU Portal</span>
+              </a>
+            )}
           </div>
 
           {/* Desktop Search bar */}

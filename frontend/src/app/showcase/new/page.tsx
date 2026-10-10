@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import { getCurrentUser } from '@/src/lib/auth';
 import { ProjectForm } from '../../../modules/showcase/components/project-form';
 import { ArrowBackIcon } from '../../../modules/showcase/components/icons';
 
-export default function NewProjectPage() {
+export default async function NewProjectPage() {
+  const user = await getCurrentUser();
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 fade-slide-up">
       <div>
@@ -21,7 +24,7 @@ export default function NewProjectPage() {
         </p>
       </div>
 
-      <ProjectForm />
+      <ProjectForm user={user} />
     </div>
   );
 }
