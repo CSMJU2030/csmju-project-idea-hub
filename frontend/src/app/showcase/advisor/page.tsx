@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCurrentUser } from '../../../lib/auth';
 import { showcaseRepository } from '../../../modules/showcase/repositories/mock/showcase.mock-repository';
 import { ApprovalActionBox } from '../../../modules/showcase/components/approval-action-box';
+import { canReviewProject } from '../../../modules/showcase/auth/permissions';
 import { cardClass } from '../../../modules/showcase/components/ui';
 import { ArrowBackIcon, CheckIcon, CloseIcon } from '../../../modules/showcase/components/icons';
 
@@ -30,16 +31,16 @@ export default async function AdvisorPortalPage() {
     );
   }
 
-  // ดึงผลงานทั้งหมดที่อาจารย์ท่านนี้เป็นที่ปรึกษา
+  // ดึงผลงานทั้งหมดที่อาจารย์ท่านนี้เป็นที่ปรึกษา (เทียบด้วย core_user_id เท่านั้น)
   const allProjects = await showcaseRepository.findProjects();
   const myProjects = allProjects.filter((p) =>
-    p.advisors.some((adv) => adv.advisorId === user.id || adv.name === user.name)
+    p.advisors.some((adv) => adv.advisorId === user.id)
   );
 
   const pendingList = myProjects.filter((p) => p.status === 'PENDING_APPROVAL');
   const approvedList = myProjects.filter((p) => p.status === 'APPROVED');
 
-  // หากไม่มีโครงงานที่ระบุ ID เจาะจงตรงกับบัญชีอาจารย์ ให้ดึงโครงงานรอตรวจทั้งหมดในภาควิชามาแสดงเพื่อให้สามารถตรวจอนุมัติได้
+  // หากไม่มีโครงงานที่ตนเองเป็นที่ปรึกษา ให้ดึงโครงงานรอตรวจทั้งหมดในภาควิชามาแสดงเพื่อให้ตรวจสอบสถานะได้
   const allPending = allProjects.filter((p) => p.status === 'PENDING_APPROVAL');
   const displayPending = pendingList.length > 0 ? pendingList : allPending;
 
@@ -106,7 +107,24 @@ export default async function AdvisorPortalPage() {
                   ผู้จัดทำ: {project.members.map((m) => m.name).join(', ')} | ปีการศึกษา {project.academicYear}
                 </div>
 
-                <ApprovalActionBox projectId={project.id} />
+                <div className="pt-2 border-t border-outline-variant/30">
+                  {canReviewProject(user, project) ? (
+                    <ApprovalActionBox projectId={project.id} />
+                  ) : (
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 text-body-sm space-y-1">
+                      <div className="font-semibold flex items-center gap-1.5 text-amber-900">
+                        <span>🔒</span>
+                        <span>สงวนสิทธิ์การตรวจอนุมัติเฉพาะอาจารย์ที่ปรึกษาของโครงงานนี้</span>
+                      </div>
+                      <p className="text-amber-800 text-caption">
+                        อาจารย์ที่ปรึกษาที่ระบุในโครงงาน: <strong>{project.advisors[0]?.name || 'ไม่ระบุ'}</strong>
+                        {project.advisors[0]?.advisorId && ` (ID: ${project.advisors[0].advisorId})`}
+                        <br />
+                        (บัญชีของคุณ <strong>{user.name || user.id}</strong> ไม่ตรงกับที่ปรึกษาของโครงงานนี้ จึงไม่มีสิทธิ์ดำเนินการ)
+                      </p>
+                    </div>
+                  )}
+                </div>
               </article>
             ))}
           </div>

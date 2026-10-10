@@ -47,10 +47,10 @@ const CATEGORIES = [
 ];
 
 const ADVISOR_PRESETS = [
+  { id: '6184827b-0b67-4454-9984-e33a202f57cc', name: 'csmju.lecturer (อาจารย์ผู้ทดสอบระบบ - Core Hub)' },
   { id: 'adv-001', name: 'ผศ.ดร. ที่ปรึกษา ใจดี' },
   { id: 'adv-002', name: 'รศ.ดร. นวัตกรรม ก้าวหน้า' },
   { id: 'adv-003', name: 'อ.ดร. เทคโนโลยี อัจฉริยะ' },
-  { id: 'lecturer', name: 'อาจารย์ผู้ทดสอบระบบ (Lecturer Test)' },
 ];
 
 interface ProjectFormProps {
@@ -60,6 +60,14 @@ interface ProjectFormProps {
 export function ProjectForm({ user }: ProjectFormProps = {}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const isTeacher = user?.role === 'TEACHER';
+  const defaultAdvisorId = isTeacher
+    ? user.id
+    : '6184827b-0b67-4454-9984-e33a202f57cc';
+  const defaultAdvisorName = isTeacher
+    ? (user.name ? `${user.name} (ฉันเอง)` : 'csmju.lecturer (ฉันเอง)')
+    : 'csmju.lecturer (อาจารย์ผู้ทดสอบระบบ - Core Hub)';
 
   const [form, setForm] = useState<FormState>({
     titleTh: '',
@@ -83,8 +91,8 @@ export function ProjectForm({ user }: ProjectFormProps = {}) {
     chapter5: '',
     memberId: user?.id || 'user-std-001',
     memberName: user?.name || 'สมชาย นักศึกษา',
-    advisorId: 'adv-001',
-    advisorName: 'ผศ.ดร. ที่ปรึกษา ใจดี',
+    advisorId: defaultAdvisorId,
+    advisorName: defaultAdvisorName,
   });
 
   const [duplicateWarning, setDuplicateWarning] = useState<DuplicateCheckResult | null>(null);
@@ -548,9 +556,26 @@ export function ProjectForm({ user }: ProjectFormProps = {}) {
           </div>
 
           <div>
-            <label htmlFor="advisorName" className="block text-sm font-semibold mb-1">
-              อาจารย์ที่ปรึกษา <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="advisorName" className="block text-sm font-semibold">
+                อาจารย์ที่ปรึกษา <span className="text-red-500">*</span>
+              </label>
+              {user?.role === 'TEACHER' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      advisorId: user.id,
+                      advisorName: `${user.name || 'csmju.lecturer'} (ฉันเอง)`,
+                    });
+                  }}
+                  className="text-xs font-semibold px-2 py-0.5 rounded bg-primary-container/10 text-primary-container hover:bg-primary-container/20 transition-colors"
+                >
+                  + ระบุฉันเป็นอาจารย์ที่ปรึกษา
+                </button>
+              )}
+            </div>
             <input
               id="advisorName"
               type="text"
@@ -563,7 +588,7 @@ export function ProjectForm({ user }: ProjectFormProps = {}) {
                 setForm({
                   ...form,
                   advisorName: val,
-                  advisorId: match ? match.id : form.advisorId || 'adv-001',
+                  advisorId: match ? match.id : form.advisorId || '6184827b-0b67-4454-9984-e33a202f57cc',
                 });
               }}
               placeholder="เลือกหรือพิมพ์ชื่ออาจารย์ที่ปรึกษา..."
@@ -574,6 +599,9 @@ export function ProjectForm({ user }: ProjectFormProps = {}) {
                 <option key={adv.id} value={adv.name} />
               ))}
             </datalist>
+            <p className="text-[11px] text-slate-500 mt-1">
+              รหัสที่ปรึกษา (Core User ID): <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">{form.advisorId}</code>
+            </p>
             {fieldErrors.advisors && (
               <p className="text-xs text-red-600 mt-1">{fieldErrors.advisors[0]}</p>
             )}

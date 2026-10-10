@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCurrentUser } from '@/src/lib/auth';
 import { showcaseRepository } from '@/src/modules/showcase/repositories/mock/showcase.mock-repository';
 import { ApprovalActionBox } from '@/src/modules/showcase/components/approval-action-box';
+import { canReviewProject } from '@/src/modules/showcase/auth/permissions';
 import { cardClass } from '@/src/modules/showcase/components/ui';
 import {
   ArrowBackIcon,
@@ -163,7 +164,26 @@ export default async function ApprovalsPage() {
 
                 {/* กล่องดำเนินการอนุมัติหรือส่งกลับแก้ไข */}
                 <div className="pt-2 border-t border-surface-variant/40">
-                  <ApprovalActionBox projectId={project.id} />
+                  {canReviewProject(user, project) ? (
+                    <ApprovalActionBox projectId={project.id} />
+                  ) : (
+                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 space-y-1">
+                      <div className="flex items-center gap-2 font-semibold text-body-md text-amber-900">
+                        <span>🔒</span>
+                        <span>สงวนสิทธิ์การตรวจอนุมัติเฉพาะอาจารย์ที่ปรึกษาของโครงงานนี้</span>
+                      </div>
+                      <p className="text-body-sm text-amber-800">
+                        อาจารย์ที่ปรึกษาของโครงงาน: <strong>{advisor ? advisor.name : 'ไม่ระบุ'}</strong>
+                        {advisor?.advisorId && (
+                          <span className="font-mono text-caption text-amber-700/80 ml-1">
+                            (ID: {advisor.advisorId})
+                          </span>
+                        )}
+                        <br />
+                        (บัญชีปัจจุบันของคุณคือ <strong>{user.name || user.id}</strong> ไม่ตรงกับอาจารย์ที่ปรึกษาของโครงงานนี้ จึงไม่มีสิทธิ์ดำเนินการอนุมัติ)
+                      </p>
+                    </div>
+                  )}
                 </div>
               </article>
             );
